@@ -57,7 +57,7 @@
     const crypto = webCrypto();
     const keyMaterial = await crypto.subtle.importKey('raw', encoder.encode(password), 'PBKDF2', false, ['deriveKey']);
     return crypto.subtle.deriveKey(
-      { name: 'PBKDF2', salt, iterations: 250000, hash: 'SHA-256' },
+      { name: 'PBKDF2', salt, iterations: 310000, hash: 'SHA-256' },
       keyMaterial,
       { name: 'AES-GCM', length: 256 },
       false,
