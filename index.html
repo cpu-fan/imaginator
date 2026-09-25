@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Файл в картинке — локальное шифрование</title>
+  <meta name="description" content="Зашифруйте файл в PNG или спрячьте его в изображении. Всё происходит локально в браузере.">
+  <link rel="stylesheet" href="styles.css">
+  <script src="vault-core.js" defer></script>
+  <script src="image-codec.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="site-header">
+      <a class="brand" href="index.html" aria-label="Файл в картинке — на главную">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+        <span>Файл в картинке</span>
+      </a>
+      <span class="local-badge"><span class="badge-dot" aria-hidden="true"></span> Работает без сервера</span>
+    </header>
+
+    <main>
+      <section class="intro" aria-labelledby="page-title">
+        <div class="intro-copy">
+          <p class="eyebrow">Локальный сейф для файлов</p>
+          <h1 id="page-title">Спрячьте важное<br><em>в обычном PNG.</em></h1>
+          <p class="intro-lead">Выберите файл, задайте пароль и скачайте картинку. Чтобы вернуть файл, откройте эту страницу снова — интернет не нужен.</p>
+          <div class="trust-line"><span class="trust-icon" aria-hidden="true">↗</span><span>Файлы и пароль остаются на вашем устройстве</span></div>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="art-grid"></div>
+          <div class="art-file"><span class="art-file-fold"></span><span class="art-file-line"></span><span class="art-file-line short"></span></div>
+          <div class="art-arrow">→</div>
+          <div class="art-picture"><span class="art-sun"></span><span class="art-hill one"></span><span class="art-hill two"></span><span class="art-lock">✦</span></div>
+          <div class="art-caption">зашифровано внутри</div>
+        </div>
+      </section>
+
+      <section class="workspace" aria-labelledby="workspace-title">
+        <div class="section-heading">
+          <div><p class="eyebrow">Ваше действие</p><h2 id="workspace-title">Что сделать с файлом?</h2></div>
+          <span class="step-label">01 / 03</span>
+        </div>
+
+        <div class="mode-tabs" role="tablist" aria-label="Режим работы">
+          <button class="mode-tab" id="tab-hide" type="button" role="tab" aria-controls="panel-hide" aria-selected="true" tabindex="0" data-mode="hide"><span class="tab-icon" aria-hidden="true">◈</span><span class="tab-copy"><strong>Скрыть в картинке</strong><small>Сохранить вид выбранного изображения</small></span><span class="tab-arrow" aria-hidden="true">↗</span></button>
+          <button class="mode-tab" id="tab-data" type="button" role="tab" aria-controls="panel-data" aria-selected="false" tabindex="-1" data-mode="data"><span class="tab-icon" aria-hidden="true">▦</span><span class="tab-copy"><strong>Создать PNG с данными</strong><small>Картинка будет создана автоматически</small></span><span class="tab-arrow" aria-hidden="true">↗</span></button>
+          <button class="mode-tab" id="tab-extract" type="button" role="tab" aria-controls="panel-extract" aria-selected="false" tabindex="-1" data-mode="extract"><span class="tab-icon" aria-hidden="true">↙</span><span class="tab-copy"><strong>Извлечь файл</strong><small>Открыть PNG и вернуть исходный файл</small></span><span class="tab-arrow" aria-hidden="true">↗</span></button>
+        </div>
+
+        <div class="form-card">
+          <form id="panel-hide" role="tabpanel" aria-labelledby="tab-hide" novalidate>
+            <div class="form-heading"><span class="form-number">01</span><div><h3>Скрыть файл в изображении</h3><p>Внешний вид картинки почти не изменится. Нужен достаточно большой носитель.</p></div></div>
+            <div class="field-grid">
+              <div class="field"><label for="hide-file">Файл для шифрования <span class="required">*</span></label><input id="hide-file" name="file" type="file" required aria-describedby="hide-file-hint hide-file-info"><p class="field-hint" id="hide-file-hint">До 10 МБ. Подойдёт и пустой файл.</p><p class="file-info" id="hide-file-info"></p></div>
+              <div class="field"><label for="hide-cover">Изображение-носитель <span class="required">*</span></label><input id="hide-cover" name="cover" type="file" accept="image/*" required aria-describedby="hide-cover-hint hide-cover-info"><p class="field-hint" id="hide-cover-hint">PNG, JPEG или другое изображение, которое открывает браузер.</p><p class="file-info" id="hide-cover-info"></p></div>
+            </div>
+            <div class="capacity-box" id="capacity-box"><span class="capacity-symbol" aria-hidden="true">▧</span><span id="capacity-text">Выберите изображение, чтобы узнать его вместимость.</span></div>
+            <div class="field password-field"><label for="hide-password">Пароль <span class="required">*</span></label><div class="password-wrap"><input id="hide-password" name="password" type="password" autocomplete="new-password" required><button class="password-toggle" type="button" aria-controls="hide-password" aria-label="Показать пароль">Показать</button></div><p class="field-hint">Сохраните пароль: без него восстановить файл нельзя.</p></div>
+            <div class="form-actions"><button class="primary-button" type="submit">Зашифровать и создать PNG <span aria-hidden="true">↗</span></button><p class="form-status" role="status" aria-live="polite"></p></div>
+            <div class="result" hidden><span class="result-icon" aria-hidden="true">✓</span><div><strong>PNG готов</strong><p>Скачайте картинку и храните её без редактирования.</p></div><a class="download-link" href="#" download>Скачать PNG <span aria-hidden="true">↓</span></a></div>
+          </form>
+
+          <form id="panel-data" role="tabpanel" aria-labelledby="tab-data" hidden novalidate>
+            <div class="form-heading"><span class="form-number">02</span><div><h3>Создать картинку с данными</h3><p>Приложение подберёт размер PNG под зашифрованный файл.</p></div></div>
+            <div class="field"><label for="data-file">Файл для шифрования <span class="required">*</span></label><input id="data-file" name="file" type="file" required aria-describedby="data-file-hint data-file-info"><p class="field-hint" id="data-file-hint">До 10 МБ. Формат исходного файла сохранится.</p><p class="file-info" id="data-file-info"></p></div>
+            <div class="field password-field"><label for="data-password">Пароль <span class="required">*</span></label><div class="password-wrap"><input id="data-password" name="password" type="password" autocomplete="new-password" required><button class="password-toggle" type="button" aria-controls="data-password" aria-label="Показать пароль">Показать</button></div><p class="field-hint">Сохраните пароль: без него восстановить файл нельзя.</p></div>
+            <div class="form-actions"><button class="primary-button" type="submit">Зашифровать и создать PNG <span aria-hidden="true">↗</span></button><p class="form-status" role="status" aria-live="polite"></p></div>
+            <div class="result" hidden><span class="result-icon" aria-hidden="true">✓</span><div><strong>PNG готов</strong><p>Скачайте картинку и храните её без редактирования.</p></div><a class="download-link" href="#" download>Скачать PNG <span aria-hidden="true">↓</span></a></div>
+          </form>
+
+          <form id="panel-extract" role="tabpanel" aria-labelledby="tab-extract" hidden novalidate>
+            <div class="form-heading"><span class="form-number">03</span><div><h3>Вернуть исходный файл</h3><p>Загрузите PNG, созданный на этой странице, и введите пароль.</p></div></div>
+            <div class="field"><label for="extract-image">Зашифрованный PNG <span class="required">*</span></label><input id="extract-image" name="image" type="file" accept="image/png,.png" required aria-describedby="extract-image-hint extract-image-info"><p class="field-hint" id="extract-image-hint">Нужен оригинальный PNG: без пересохранения или изменения размера.</p><p class="file-info" id="extract-image-info"></p></div>
+            <div class="field password-field"><label for="extract-password">Пароль <span class="required">*</span></label><div class="password-wrap"><input id="extract-password" name="password" type="password" autocomplete="current-password" required><button class="password-toggle" type="button" aria-controls="extract-password" aria-label="Показать пароль">Показать</button></div></div>
+            <div class="form-actions"><button class="primary-button" type="submit">Извлечь файл <span aria-hidden="true">↗</span></button><p class="form-status" role="status" aria-live="polite"></p></div>
+            <div class="result" hidden><span class="result-icon" aria-hidden="true">✓</span><div><strong>Файл восстановлен</strong><p class="result-detail"></p></div><a class="download-link" href="#" download>Скачать файл <span aria-hidden="true">↓</span></a></div>
+          </form>
+        </div>
+      </section>
+
+      <aside class="notes" aria-label="Полезно знать"><div><span class="note-number">01</span><h2>Всё остаётся у вас</h2><p>Шифрование и работа с картинкой выполняются в этом браузере. Файлы никуда не отправляются.</p></div><div><span class="note-number">02</span><h2>Берегите оригинал</h2><p>Для извлечения нужен скачанный PNG без обработки редактором или преобразования в JPEG.</p></div><div><span class="note-number">03</span><h2>Не теряйте пароль</h2><p>Приложение его не хранит. Если пароль забыт, восстановить содержимое невозможно.</p></div></aside>
+    </main>
+    <footer class="site-footer"><span>Файл в картинке</span><span>Локальное приложение · до 10 МБ</span></footer>
+  </div>
+</body>
+</html>
