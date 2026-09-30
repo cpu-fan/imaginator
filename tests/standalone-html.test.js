@@ -21,11 +21,12 @@ test('built HTML works without local CSS or JavaScript files', async () => {
   assert.match(html, /<style>[\s\S]+<\/style>/);
 
   const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((match) => match[1]);
-  assert.equal(scripts.length, 3);
+  assert.equal(scripts.length, 4);
 
   const context = vm.createContext({ TextEncoder, TextDecoder, Uint8Array, Uint8ClampedArray, crypto: webcrypto });
   vm.runInContext(scripts[0], context);
   vm.runInContext(scripts[1], context);
+  vm.runInContext(scripts[2], context);
 
   const source = Uint8Array.from([0, 42, 255]);
   const packet = await context.VaultCore.encryptFile({ name: 'sample.bin', type: 'application/octet-stream', bytes: source }, 'secret');
