@@ -35,3 +35,48 @@ test('busy operation disables selects and prevents a second submit',async()=>{
 test('filenames render as text rather than markup',async()=>{
  const h=createAppHarness();await h.setFiles('data-file',[new File(['x'],'<img onerror=boom>.bin')]);await h.setValue('data-password','secret');await h.submit('data');assert.equal(h.hasResult('data'),true);assert.equal(h.nodes.get('data-results').querySelectorAll('img').length,0);assert.match(h.nodes.get('data-results').textContent,/<img onerror=boom>/);h.unload();
 });
+
+const {makeV2Packet}=require('./helpers/v2-packet-fixture.js');
+const Codec=require('../image-codec.js'),Core=require('../vault-core.js');
+const setId='000102030405060708090a0b0c0d0e0f';
+function pngPacket(packet,name='renamed.png') {const file=new File([Uint8Array.of(137,80,78,71,13,10,26,10)],name,{type:'image/png'});file.image=Codec.encodeData(packet);return file;}
+function pngPart(index,bytes,offset,extra={}) {return pngPacket(makeV2Packet({setId,name:'original.bin',type:'application/octet-stream',index,count:3,totalSize:5,offset,length:bytes.length,...extra},Uint8Array.from(bytes)));}
+const pngSet=()=>[pngPart(0,[0,255],0),pngPart(1,[42],2),pngPart(2,[7,8],3)];
+async function extract(h,files,password='interop'){await h.setFiles('extract-image',files);await h.setValue('extract-password',password);await h.submit('extract');}
+test('restore reorders renamed parts and returns exact original bytes and type',async()=>{
+ const h=createAppHarness(),files=pngSet(),input=[files[2],files[0],files[1]];await extract(h,input);
+ const entries=h.entries('extract');assert.equal(entries.length,1);assert.equal(entries[0].name,'original.bin');assert.equal(entries[0].blob.type,'application/octet-stream');assert.deepEqual([...new Uint8Array(await entries[0].blob.arrayBuffer())],[0,255,42,7,8]);assert.deepEqual(input,[files[2],files[0],files[1]]);assert.match(h.nodes.get('extract-image-info').textContent,/3/);h.unload();
+});
+test('single v2 empty and path-containing names restore correctly',async()=>{
+ const h=createAppHarness();await extract(h,[pngPart(0,[],0,{count:1,totalSize:0,name:'../folder\\safe.bin',type:''})]);assert.equal(h.entries('extract')[0].name,'safe.bin');assert.equal(h.entries('extract')[0].blob.size,0);assert.equal(h.entries('extract')[0].blob.type,'application/octet-stream');h.unload();
+});
+test('legacy standalone file still restores',async()=>{
+ const h=createAppHarness(),file={name:'old.txt',type:'text/plain',bytes:Uint8Array.of(65)};await extract(h,[pngPacket(await Core.encryptFile(file,'secret'))],'secret');assert.equal(h.entries('extract')[0].name,'old.txt');assert.deepEqual([...new Uint8Array(await h.entries('extract')[0].blob.arrayBuffer())],[65]);h.unload();
+});
+test('missing parts list every missing one-based number',async()=>{
+ const h=createAppHarness();await extract(h,[pngPart(0,[1],0,{count:4,totalSize:4}),pngPart(2,[3],2,{count:4,totalSize:4})]);assert.equal(h.entries('extract').length,0);assert.match(h.status('extract'),/2.*4/);await extract(h,pngSet());assert.equal(h.entries('extract').length,1);h.unload();
+});
+test('duplicate part reports its number without returning data',async()=>{
+ const h=createAppHarness(),files=pngSet();await extract(h,[files[0],files[0],files[1]]);assert.equal(h.hasResult('extract'),false);assert.match(h.status('extract'),/1/);await extract(h,files);assert.equal(h.entries('extract').length,1);h.unload();
+});
+test('same salt and filename do not permit mixing protected set IDs',async()=>{
+ const h=createAppHarness(),files=pngSet();files[1]=pngPart(1,[42],2,{setId:'f'.repeat(32)});await extract(h,files);assert.equal(h.hasResult('extract'),false);assert.match(h.status('extract'),/набор/);await extract(h,pngSet());assert.equal(h.entries('extract').length,1);h.unload();
+});
+test('mixed versions and multiple legacy files are rejected',async()=>{
+ const h=createAppHarness(),legacy=pngPacket(await Core.encryptFile({name:'old',type:'',bytes:Uint8Array.of(7)},'interop'));
+ for(const files of [[legacy,legacy],[legacy,pngSet()[0]],[pngSet()[0],legacy]]){await extract(h,files);assert.equal(h.hasResult('extract'),false);assert.match(h.status('extract'),/один|смеш|формат|набор/);}
+ await extract(h,pngSet());assert.equal(h.entries('extract').length,1);h.unload();
+});
+test('wrong ranges password damaged packet and JPEG never return a file',async()=>{
+ const h=createAppHarness();
+ const corrupt=makeV2Packet({setId,name:'x',type:'',index:0,count:1,totalSize:1,offset:0,length:1},Uint8Array.of(7));corrupt[corrupt.length-1]^=1;
+ for(const [files,password] of [[ [pngSet()[0],pngPart(1,[42],3),pngSet()[2]],'interop'],[pngSet(),'wrong'],[[pngPacket(corrupt)],'interop'],[[new File(['jpeg'],'fake.png')],'interop']]){await extract(h,files,password);assert.equal(h.hasResult('extract'),false);assert.equal(h.activeUrls.size,0);}
+ await extract(h,pngSet());assert.equal(h.entries('extract').length,1);h.unload();
+});
+test('more than 1000 PNGs are rejected before decoding',async()=>{
+ let decodes=0;const h=createAppHarness({imageCodec:codec=>({...codec,decode(...args){decodes++;return codec.decode(...args);}})});await extract(h,Array(1001).fill(pngSet()[0]));assert.equal(decodes,0);assert.equal(h.hasResult('extract'),false);await extract(h,pngSet());assert.equal(h.entries('extract').length,1);h.unload();
+});
+test('failed restored Blob is cleared and the next attempt succeeds',async()=>{
+ let calls=0;class FailingBlob extends Blob {constructor(...args){calls++;if(calls===1)throw new RangeError('Blob allocation failed');super(...args);}}
+ const h=createAppHarness({globals:{Blob:FailingBlob}});await extract(h,pngSet());assert.equal(h.hasResult('extract'),false);assert.equal(h.activeUrls.size,0);assert.equal(h.controlsDisabled(),false);await extract(h,pngSet());assert.equal(h.entries('extract').length,1);h.unload();
+});

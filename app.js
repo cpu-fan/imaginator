@@ -226,6 +226,9 @@
 
   function friendlyError(error, mode) {
     const message = error && error.message ? error.message : '';
+    if (error && error.code === 'MISSING_PARTS') return `Не хватает частей: ${error.details.numbers.join(', ')}. Выберите полный набор PNG.`;
+    if (error && error.code === 'DUPLICATE_PART') return `Часть ${error.details.number} выбрана повторно. Уберите её копию.`;
+    if (/allocation|memory/i.test(message)) return 'Браузеру не хватило ресурсов. Уменьшите размер части или обрабатываемого файла и попробуйте снова.';
     if (message === 'Invalid image magic') return 'В этом PNG нет данных приложения. Выберите исходный PNG, полученный здесь.';
     if (message === 'Wrong password or corrupted file packet') return 'Неверный пароль или PNG повреждён. Проверьте пароль и загрузите исходный PNG.';
     if (/Malformed file packet|Unsupported file packet|Declared packet length|Image header exceeds capacity/.test(message)) return 'Данные в PNG повреждены или формат не поддерживается. Нужен исходный PNG без изменений.';
@@ -274,21 +277,44 @@
     }
   }
 
+  async function restorePngFiles(files, password) {
+    if (files.length < 1 || files.length > FileParts.MAX_PART_COUNT) throw new Error('Выберите от 1 до 1000 PNG: полный набор частей или один старый PNG.');
+    const session = VaultCore.createDecryptSession(password), parts = [];
+    let version, receivedSize = 0;
+    for (let index = 0; index < files.length; index++) {
+      setStatus(forms.extract, `Открываем PNG: ${index + 1} из ${files.length}…`);
+      await assertPng(files[index]);
+      const image = await imagePixels(files[index], false), decoded = ImageCodec.decode(image.pixels, image.width, image.height);
+      const part = await session.decryptPacket(decoded.packet);
+      if (version && version !== part.version) throw new Error('Нельзя смешивать старые PNG и части нового набора.');
+      version = part.version;
+      if (version === 1) {
+        if (files.length !== 1) throw new Error('Для старого формата выберите один PNG. Несколько самостоятельных файлов нельзя собрать в набор.');
+        return {name:restoredName(part.name),type:part.type,blob:new Blob([part.bytes],{type:part.type || 'application/octet-stream'})};
+      }
+      FileParts.validatePart(part);
+      receivedSize += part.length;
+      if (receivedSize > part.totalSize) {
+        // Check identity/duplicates first so the actionable error wins.
+        FileParts.validateSet([...parts, part]);
+        throw new Error('Объём данных частей превышает размер исходного файла.');
+      }
+      parts.push(part);
+      try { FileParts.validateSet(parts); }
+      catch (error) { if (error.code !== 'MISSING_PARTS') throw error; }
+    }
+    const ordered = FileParts.validateSet(parts), first = ordered[0];
+    return {name:restoredName(first.name),type:first.type,blob:new Blob(ordered.map(part=>part.bytes),{type:first.type || 'application/octet-stream'})};
+  }
+
   async function perform(mode) {
     const form = forms[mode];
     clearResult(form);
     try {
       if (mode === 'extract') {
-        const file = selectedFile('extract-image', 'PNG');
-        const password = passwordFor(mode);
-        await assertPng(file);
-        setStatus(form, 'Открываем PNG и проверяем пароль…');
-        const image = await imagePixels(file, false);
-        const decoded = ImageCodec.decode(image.pixels, image.width, image.height);
-        const restored = await VaultCore.decryptFile(decoded.packet, password);
-        const blob = new Blob([restored.bytes], { type: restored.type || 'application/octet-stream' });
-        const name = restoredName(restored.name);
-        showResult(form, blob, name, `${name} · ${formatSize(restored.bytes.length)}`);
+        const files = Array.from(document.getElementById('extract-image').files), password = passwordFor(mode);
+        const restored = await restorePngFiles(files, password);
+        showResult(form, restored.blob, restored.name, `${restored.name} · ${formatSize(restored.blob.size)}`);
         setStatus(form, 'Файл успешно восстановлен. Скачайте его ниже.');
         return;
       }
@@ -374,7 +400,9 @@
       setStatus(form, '');
       const info = document.getElementById(`${input.id}-info`);
       const file = input.files[0];
-      info.textContent = file ? `${file.name} · ${formatSize(file.size)}` : '';
+      info.textContent = input.id === 'extract-image' && input.files.length > 0
+        ? `Выбрано PNG: ${input.files.length} · ${formatSize(Array.from(input.files).reduce((sum,item)=>sum+item.size,0))}`
+        : file ? `${file.name} · ${formatSize(file.size)}` : '';
       if (input.id === 'data-file') updateSplitPreview();
       if (input.id === 'hide-file' || input.id === 'hide-cover') updateCoverCapacity();
     });
