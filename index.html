@@ -6,10 +6,10 @@
   <meta name="color-scheme" content="light">
   <title>Файл в картинке — локальное шифрование</title>
   <meta name="description" content="Зашифруйте файл в PNG или спрячьте его в изображении. Всё происходит локально в браузере.">
-  <link rel="stylesheet" href="styles.css">
-  <script src="vault-core.js" defer></script>
-  <script src="image-codec.js" defer></script>
-  <script src="app.js" defer></script>
+  <style>
+:root{font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#1a2522;background:#f5f7f2;font-synthesis:none}*{box-sizing:border-box}body{margin:0}button,input{font:inherit}button{cursor:pointer}a{color:inherit}.page-shell{max-width:1280px;margin:auto;padding:0 clamp(20px,4.5vw,72px)}.site-header,.site-footer{display:flex;justify-content:space-between;align-items:center}.site-header{height:100px}.brand{display:inline-flex;align-items:center;gap:12px;text-decoration:none;font-weight:800;letter-spacing:-.04em;font-size:20px}.brand-mark{display:grid;grid-template-columns:repeat(2,9px);gap:3px;transform:rotate(-9deg)}.brand-mark span{width:9px;height:9px;background:#22543f;border-radius:2px}.brand-mark span:nth-child(2){background:#a9d9ae}.brand-mark span:nth-child(3){background:#94b9a0}.local-badge{display:flex;gap:9px;align-items:center;border:1px solid #d9e4d9;background:#edf4ec;border-radius:50px;padding:9px 15px;color:#32664e;font-size:12px;font-weight:750;letter-spacing:.03em}.badge-dot{width:7px;height:7px;background:#59ae70;border-radius:50%;box-shadow:0 0 0 4px #d9eadc}.intro{display:grid;grid-template-columns:1.08fr .92fr;min-height:452px;align-items:center;gap:50px;padding:38px 0 55px}.eyebrow{text-transform:uppercase;letter-spacing:.18em;font-size:11px;font-weight:850;color:#4d8065;margin:0 0 19px}.intro h1{font-size:clamp(43px,5.2vw,72px);line-height:1.06;letter-spacing:-.075em;margin:0;color:#182820;font-weight:800}.intro h1 em{font-style:normal;color:#39785a}.intro-lead{font-size:17px;line-height:1.65;color:#63746b;max-width:530px;margin:25px 0 28px}.trust-line{display:flex;align-items:center;gap:10px;color:#3c5e4a;font-size:13px;font-weight:650}.trust-icon{display:grid;place-items:center;border:1px solid #b8d6c1;border-radius:50%;width:24px;height:24px;font-size:15px}.hero-art{height:365px;position:relative;border-radius:24px;background:#dfece1;overflow:hidden;border:1px solid #d6e6d9;box-shadow:0 25px 55px #2c5e3f12}.art-grid{position:absolute;inset:0;background-image:linear-gradient(#fff7 1px,transparent 1px),linear-gradient(90deg,#fff7 1px,transparent 1px);background-size:27px 27px;mask-image:radial-gradient(circle at center,#000,transparent 78%)}.art-file,.art-picture{position:absolute;top:91px;box-shadow:0 20px 30px #3767472e}.art-file{left:12%;width:113px;height:145px;border-radius:12px;background:#fff;transform:rotate(-10deg);padding:52px 20px 0}.art-file-fold{position:absolute;right:0;top:0;border-left:28px solid #d5e4dc;border-bottom:28px solid transparent}.art-file-line{display:block;height:7px;background:#b9d5bf;border-radius:10px;margin-bottom:12px}.art-file-line.short{width:67%}.art-arrow{position:absolute;top:142px;left:46%;font-size:37px;color:#4d8a65;font-weight:300}.art-picture{right:11%;width:158px;height:154px;background:#f6fbf6;border:9px solid #fff;border-radius:17px;overflow:hidden;transform:rotate(9deg)}.art-sun{position:absolute;top:19px;right:20px;width:23px;height:23px;border-radius:50%;background:#e8c98a}.art-hill{position:absolute;width:165px;height:95px;border-radius:50% 50% 0 0;bottom:-29px;left:-39px;background:#9ec9aa;transform:rotate(-22deg)}.art-hill.two{left:48px;bottom:-35px;background:#69a783;transform:rotate(26deg)}.art-lock{position:absolute;left:57px;top:49px;color:white;font-size:34px;text-shadow:0 2px 12px #417351}.art-caption{position:absolute;bottom:43px;left:50%;transform:translateX(-50%);white-space:nowrap;color:#648776;background:#f4faf2;border:1px solid #d2e3d2;border-radius:100px;padding:9px 15px;font-size:11px;letter-spacing:.07em;text-transform:uppercase;font-weight:800}.workspace{padding:25px 0 0}.section-heading{display:flex;justify-content:space-between;align-items:end;margin:0 0 24px}.section-heading .eyebrow{margin-bottom:8px}.section-heading h2{font-size:32px;letter-spacing:-.055em;margin:0}.step-label{font-size:12px;font-weight:800;color:#84958a;letter-spacing:.1em;padding-bottom:5px}.mode-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:16px}.mode-tab{appearance:none;text-align:left;display:flex;align-items:flex-start;gap:14px;position:relative;border:1px solid #dce7dc;background:#fff;border-radius:17px;min-height:112px;padding:19px 17px;box-shadow:0 7px 20px #23442d08;transition:transform .18s,border-color .18s,background .18s}.mode-tab:hover{transform:translateY(-2px);border-color:#98b99d}.mode-tab[aria-selected=true]{border-color:#367456;background:#eef5ed;box-shadow:inset 0 0 0 1px #367456}.tab-icon{display:grid;place-items:center;flex:none;background:#e3eee5;color:#367456;border-radius:10px;width:34px;height:34px;font-size:20px}.mode-tab[aria-selected=true] .tab-icon{background:#377657;color:#fff}.tab-copy{display:grid;gap:6px;padding-top:2px}.tab-copy strong{font-size:14px;line-height:1.3}.tab-copy small{font-size:12px;line-height:1.4;color:#74847b}.tab-arrow{position:absolute;right:15px;bottom:14px;color:#779781;font-size:16px}.form-card{background:#fff;border:1px solid #e0e9df;border-radius:23px;padding:clamp(24px,3.8vw,48px);box-shadow:0 18px 55px #2c4a2d0c}.form-card form[hidden]{display:none}.form-heading{display:flex;gap:17px;align-items:flex-start;margin-bottom:33px}.form-number{border:1px solid #d5e6d8;color:#397555;background:#ecf5ed;border-radius:8px;padding:7px 9px;font-size:11px;font-weight:850}.form-heading h3{font-size:25px;letter-spacing:-.045em;margin:0 0 6px}.form-heading p{color:#7a8a7f;margin:0;font-size:14px;line-height:1.5}.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}.field{margin-bottom:24px}.field label{display:block;font-size:13px;font-weight:750;margin-bottom:10px}.required{color:#c2765c}.field input[type=file]{width:100%;border:1px dashed #adc9b3;border-radius:11px;background:#f7faf6;padding:14px;color:#4a6954;font-size:13px;min-height:61px}.field input[type=file]::file-selector-button{border:1px solid #c5d9c7;border-radius:6px;background:white;color:#2c6347;font-weight:750;padding:8px 11px;margin-right:10px;cursor:pointer}.field-hint,.file-info{font-size:12px;line-height:1.5;margin:7px 0 0;color:#849188}.file-info:not(:empty){color:#377456;font-weight:700}.capacity-box{display:flex;align-items:center;gap:12px;background:#eff6ef;color:#4a7355;border:1px solid #dcebdd;border-radius:11px;padding:14px 17px;margin:0 0 25px;font-size:13px;line-height:1.45}.capacity-box.is-error{background:#fff4f0;border-color:#f1d5ca;color:#a4523c}.capacity-symbol{font-size:19px}.password-field{max-width:510px}.password-wrap{position:relative}.password-wrap input{width:100%;height:48px;border:1px solid #cddbd0;border-radius:9px;padding:10px 100px 10px 13px;color:#1d3225;background:#fff}.password-toggle{position:absolute;right:6px;top:6px;height:36px;border:0;background:transparent;color:#326c4e;font-size:12px;font-weight:800;padding:0 10px;border-radius:5px}.password-toggle:hover{background:#eef5ed}.form-actions{display:flex;align-items:center;gap:19px;flex-wrap:wrap;margin-top:33px;padding-top:25px;border-top:1px solid #e7eee7}.primary-button{border:0;background:#285d43;color:white;border-radius:9px;padding:15px 19px;font-weight:750;font-size:13px;min-height:48px;display:inline-flex;align-items:center;gap:30px;justify-content:space-between;box-shadow:0 7px 15px #285d4324}.primary-button:hover{background:#1b4f36}.primary-button:disabled{opacity:.6;cursor:wait}.form-status{margin:0;font-size:13px;line-height:1.5;color:#516b57}.form-status.is-error{color:#a14835;font-weight:700}.result{display:flex;align-items:center;gap:15px;border:1px solid #c9e5cf;background:#f0f8f0;border-radius:12px;padding:17px;margin-top:22px}.result[hidden]{display:none}.result-icon{display:grid;place-items:center;background:#39805c;color:white;border-radius:50%;width:29px;height:29px;flex:none;font-weight:800}.result strong{font-size:14px}.result p{margin:4px 0 0;font-size:12px;color:#6c8573;line-height:1.4}.download-link{margin-left:auto;white-space:nowrap;background:white;border:1px solid #bcd8c3;color:#285f43;text-decoration:none;font-size:12px;font-weight:800;padding:11px 14px;border-radius:8px}.download-link:hover{background:#e3f1e5}.notes{display:grid;grid-template-columns:repeat(3,1fr);gap:42px;padding:68px 0 55px}.notes>div{border-top:1px solid #cedbd0;padding-top:18px}.note-number{font-size:11px;color:#43845e;font-weight:850}.notes h2{font-size:15px;margin:15px 0 8px}.notes p{font-size:13px;line-height:1.55;color:#75857b;margin:0}.site-footer{border-top:1px solid #dce7dc;min-height:80px;color:#86958a;font-size:12px}.site-footer span:first-child{font-weight:800;color:#4c6655}input:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid #87cda1;outline-offset:3px}@media(max-width:880px){.intro{grid-template-columns:1fr;gap:20px;padding-top:20px}.hero-art{height:260px}.art-file,.art-picture{top:45px}.art-arrow{top:96px}.mode-tabs{grid-template-columns:1fr}.mode-tab{min-height:72px}.tab-arrow{bottom:auto;top:26px}.field-grid{grid-template-columns:1fr;gap:0}.notes{gap:20px}}@media(max-width:580px){.page-shell{padding:0 17px}.site-header{height:75px}.brand{font-size:16px}.local-badge{font-size:0;padding:10px}.badge-dot{margin:0}.intro{padding:17px 0 40px}.intro h1{font-size:46px}.intro-lead{font-size:15px}.hero-art{height:210px}.art-file{left:9%;top:35px;transform:scale(.75) rotate(-10deg);transform-origin:top left}.art-picture{right:6%;top:32px;transform:scale(.78) rotate(9deg);transform-origin:top right}.art-arrow{top:83px;left:45%;font-size:28px}.art-caption{bottom:20px}.section-heading h2{font-size:27px}.form-card{padding:23px 18px}.form-heading h3{font-size:22px}.form-actions{align-items:stretch}.primary-button{width:100%}.result{align-items:flex-start;flex-wrap:wrap}.download-link{margin:4px 0 0 43px}.notes{grid-template-columns:1fr;padding:45px 0;gap:25px}.site-footer{gap:10px}}
+
+</style>
 </head>
 <body>
   <div class="page-shell">
@@ -85,5 +85,605 @@
     </main>
     <footer class="site-footer"><span>Файл в картинке</span><span>Локальное приложение · до 10 МБ</span></footer>
   </div>
+  <script>
+(function (root) {
+  'use strict';
+
+  const MAGIC = Uint8Array.from([70, 86, 76, 84]); // FVLT
+  const VERSION = 1;
+  const HEADER_LENGTH = 37;
+  const PLAINTEXT_HEADER_LENGTH = 8;
+  const GCM_TAG_LENGTH = 16;
+  const MAX_FILE_LENGTH = 10 * 1024 * 1024;
+  const encoder = new TextEncoder();
+  const decoder = new TextDecoder('utf-8', { fatal: true });
+
+  function webCrypto() {
+    const crypto = typeof module === 'object' && module.exports
+      ? require('node:crypto').webcrypto
+      : root.crypto;
+    if (!crypto || !crypto.subtle || !crypto.getRandomValues) {
+      throw new Error('Web Crypto is unavailable');
+    }
+    return crypto;
+  }
+
+  function metadata(name, type) {
+    if (typeof name !== 'string' || typeof type !== 'string') {
+      throw new TypeError('File name and MIME type must be strings');
+    }
+    const nameBytes = encoder.encode(name);
+    const typeBytes = encoder.encode(type);
+    if (nameBytes.length > 0xffff || typeBytes.length > 0xffff) {
+      throw new RangeError('File name or MIME type is too long');
+    }
+    return { nameBytes, typeBytes };
+  }
+
+  function checkFileLength(fileSize) {
+    if (!Number.isSafeInteger(fileSize) || fileSize < 0) {
+      throw new RangeError('Invalid file length');
+    }
+    if (fileSize > MAX_FILE_LENGTH) {
+      throw new RangeError('File exceeds 10 MiB limit');
+    }
+  }
+
+  function estimatePacketLength(fileSize, name, mimeType) {
+    checkFileLength(fileSize);
+    const { nameBytes, typeBytes } = metadata(name, mimeType);
+    return HEADER_LENGTH + PLAINTEXT_HEADER_LENGTH + nameBytes.length + typeBytes.length + fileSize + GCM_TAG_LENGTH;
+  }
+
+  function checkPassword(password) {
+    if (typeof password !== 'string' || !password.trim()) {
+      throw new TypeError('A non-blank password is required');
+    }
+  }
+
+  async function deriveKey(password, salt, usage) {
+    const crypto = webCrypto();
+    const keyMaterial = await crypto.subtle.importKey('raw', encoder.encode(password), 'PBKDF2', false, ['deriveKey']);
+    return crypto.subtle.deriveKey(
+      { name: 'PBKDF2', salt, iterations: 310000, hash: 'SHA-256' },
+      keyMaterial,
+      { name: 'AES-GCM', length: 256 },
+      false,
+      [usage]
+    );
+  }
+
+  async function encryptFile(file, password) {
+    checkPassword(password);
+    if (!file || !(file.bytes instanceof Uint8Array)) {
+      throw new TypeError('File bytes must be a Uint8Array');
+    }
+    checkFileLength(file.bytes.length);
+    const { nameBytes, typeBytes } = metadata(file.name, file.type);
+    const plaintext = new Uint8Array(PLAINTEXT_HEADER_LENGTH + nameBytes.length + typeBytes.length + file.bytes.length);
+    const fields = new DataView(plaintext.buffer);
+    fields.setUint16(0, nameBytes.length);
+    fields.setUint16(2, typeBytes.length);
+    fields.setUint32(4, file.bytes.length);
+    plaintext.set(nameBytes, PLAINTEXT_HEADER_LENGTH);
+    plaintext.set(typeBytes, PLAINTEXT_HEADER_LENGTH + nameBytes.length);
+    plaintext.set(file.bytes, PLAINTEXT_HEADER_LENGTH + nameBytes.length + typeBytes.length);
+
+    const crypto = webCrypto();
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const key = await deriveKey(password, salt, 'encrypt');
+    const ciphertext = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, plaintext));
+    const packet = new Uint8Array(HEADER_LENGTH + ciphertext.length);
+    packet.set(MAGIC);
+    packet[4] = VERSION;
+    new DataView(packet.buffer).setUint32(5, ciphertext.length);
+    packet.set(salt, 9);
+    packet.set(iv, 25);
+    packet.set(ciphertext, HEADER_LENGTH);
+    return packet;
+  }
+
+  async function decryptFile(packet, password) {
+    checkPassword(password);
+    if (!(packet instanceof Uint8Array) || packet.length < HEADER_LENGTH + PLAINTEXT_HEADER_LENGTH + GCM_TAG_LENGTH) {
+      throw new Error('Malformed file packet');
+    }
+    if (!MAGIC.every((byte, index) => packet[index] === byte) || packet[4] !== VERSION) {
+      throw new Error('Unsupported file packet');
+    }
+    const ciphertextLength = new DataView(packet.buffer, packet.byteOffset + 5, 4).getUint32(0);
+    if (ciphertextLength !== packet.length - HEADER_LENGTH || ciphertextLength < PLAINTEXT_HEADER_LENGTH + GCM_TAG_LENGTH) {
+      throw new Error('Malformed file packet');
+    }
+    const salt = packet.slice(9, 25);
+    const iv = packet.slice(25, HEADER_LENGTH);
+    const ciphertext = packet.slice(HEADER_LENGTH);
+    const key = await deriveKey(password, salt, 'decrypt');
+    let plaintext;
+    try {
+      plaintext = new Uint8Array(await webCrypto().subtle.decrypt({ name: 'AES-GCM', iv }, key, ciphertext));
+    } catch {
+      throw new Error('Wrong password or corrupted file packet');
+    }
+    if (plaintext.length < PLAINTEXT_HEADER_LENGTH) {
+      throw new Error('Malformed file packet');
+    }
+    const fields = new DataView(plaintext.buffer);
+    const nameLength = fields.getUint16(0);
+    const typeLength = fields.getUint16(2);
+    const fileLength = fields.getUint32(4);
+    if (fileLength > MAX_FILE_LENGTH || PLAINTEXT_HEADER_LENGTH + nameLength + typeLength + fileLength !== plaintext.length) {
+      throw new Error('Malformed file packet');
+    }
+    const nameEnd = PLAINTEXT_HEADER_LENGTH + nameLength;
+    const typeEnd = nameEnd + typeLength;
+    return {
+      name: decoder.decode(plaintext.subarray(PLAINTEXT_HEADER_LENGTH, nameEnd)),
+      type: decoder.decode(plaintext.subarray(nameEnd, typeEnd)),
+      bytes: plaintext.slice(typeEnd)
+    };
+  }
+
+  const VaultCore = { estimatePacketLength, encryptFile, decryptFile };
+  if (typeof module === 'object' && module.exports) {
+    module.exports = VaultCore;
+  } else {
+    root.VaultCore = VaultCore;
+  }
+})(globalThis);
+
+</script>
+  <script>
+(function (root) {
+  'use strict';
+
+  const DATA_MAGIC = [86, 68, 65, 84]; // VDAT
+  const STEGO_MAGIC = [86, 83, 84, 71]; // VSTG
+  const HEADER_LENGTH = 8;
+  const MAX_SIDE = 16384;
+  const MAX_PIXELS = 100000000;
+
+  function dimensions(width, height) {
+    if (!Number.isSafeInteger(width) || !Number.isSafeInteger(height) ||
+        width < 1 || height < 1 || width > MAX_SIDE || height > MAX_SIDE ||
+        width * height > MAX_PIXELS) {
+      throw new RangeError('Invalid image dimensions');
+    }
+    return width * height;
+  }
+
+  function checkPixels(pixels, width, height) {
+    const count = dimensions(width, height);
+    if (!(pixels instanceof Uint8ClampedArray) || pixels.length !== count * 4) {
+      throw new TypeError('Pixels must be an RGBA Uint8ClampedArray matching the dimensions');
+    }
+    return count;
+  }
+
+  function checkPacket(packet) {
+    if (!(packet instanceof Uint8Array)) {
+      throw new TypeError('Packet must be a Uint8Array');
+    }
+    if (packet.length > 0xffffffff) {
+      throw new RangeError('Packet length exceeds header limit');
+    }
+  }
+
+  function header(magic, length) {
+    const bytes = new Uint8Array(HEADER_LENGTH);
+    bytes.set(magic);
+    new DataView(bytes.buffer).setUint32(4, length);
+    return bytes;
+  }
+
+  function rgbIndex(channel) {
+    return channel + Math.floor(channel / 3);
+  }
+
+  function coverCapacity(width, height) {
+    return Math.max(0, Math.floor(dimensions(width, height) * 3 / 8) - HEADER_LENGTH);
+  }
+
+  function encodeData(packet) {
+    checkPacket(packet);
+    const requiredPixels = Math.ceil((HEADER_LENGTH + packet.length) / 3);
+    if (requiredPixels > MAX_PIXELS) {
+      throw new RangeError('Packet exceeds image capacity');
+    }
+    const width = Math.ceil(Math.sqrt(requiredPixels));
+    const height = Math.ceil(requiredPixels / width);
+    dimensions(width, height);
+    const pixels = new Uint8ClampedArray(width * height * 4);
+    for (let i = 3; i < pixels.length; i += 4) pixels[i] = 255;
+    const bytes = header(DATA_MAGIC, packet.length);
+    for (let i = 0; i < bytes.length; i++) pixels[rgbIndex(i)] = bytes[i];
+    for (let i = 0; i < packet.length; i++) pixels[rgbIndex(HEADER_LENGTH + i)] = packet[i];
+    return { width, height, pixels };
+  }
+
+  function encodeStego(packet, pixels, width, height) {
+    checkPacket(packet);
+    checkPixels(pixels, width, height);
+    if (Math.floor(width * height * 3 / 8) < HEADER_LENGTH + packet.length) {
+      throw new RangeError('Packet exceeds cover capacity');
+    }
+    const output = pixels.slice();
+    for (let i = 3; i < output.length; i += 4) output[i] = 255;
+    const bytes = header(STEGO_MAGIC, packet.length);
+    function embed(byte, byteIndex) {
+      for (let bit = 0; bit < 8; bit++) {
+        const index = rgbIndex(byteIndex * 8 + bit);
+        output[index] = (output[index] & 254) | ((byte >> (7 - bit)) & 1);
+      }
+    }
+    for (let i = 0; i < bytes.length; i++) embed(bytes[i], i);
+    for (let i = 0; i < packet.length; i++) embed(packet[i], HEADER_LENGTH + i);
+    return output;
+  }
+
+  function decode(pixels, width, height) {
+    const count = checkPixels(pixels, width, height);
+    const channels = count * 3;
+    function readByte(mode, position) {
+      if (mode === 'data') return pixels[rgbIndex(position)];
+      let value = 0;
+      for (let bit = 0; bit < 8; bit++) {
+        value = (value << 1) | (pixels[rgbIndex(position * 8 + bit)] & 1);
+      }
+      return value;
+    }
+    function matches(magic, mode) {
+      if (channels < magic.length * (mode === 'data' ? 1 : 8)) return false;
+      return magic.every((byte, i) => readByte(mode, i) === byte);
+    }
+    let mode;
+    if (matches(DATA_MAGIC, 'data')) mode = 'data';
+    else if (matches(STEGO_MAGIC, 'stego')) mode = 'stego';
+    else throw new Error('Invalid image magic');
+    const availableBytes = Math.floor(channels / (mode === 'data' ? 1 : 8));
+    if (availableBytes < HEADER_LENGTH) throw new RangeError('Image header exceeds capacity');
+    let length = 0;
+    for (let i = 4; i < HEADER_LENGTH; i++) length = length * 256 + readByte(mode, i);
+    if (length > availableBytes - HEADER_LENGTH) {
+      throw new RangeError('Declared packet length exceeds image capacity');
+    }
+    const packet = new Uint8Array(length);
+    for (let i = 0; i < length; i++) packet[i] = readByte(mode, HEADER_LENGTH + i);
+    return { mode, packet };
+  }
+
+  root.ImageCodec = { coverCapacity, encodeData, encodeStego, decode };
+  if (typeof module === 'object' && module.exports) module.exports = root.ImageCodec;
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+
+</script>
+  <script>
+(function () {
+  'use strict';
+
+  const MAX_FILE_SIZE = 10 * 1024 * 1024;
+  const PNG_SIGNATURE = [137, 80, 78, 71, 13, 10, 26, 10];
+  const modes = ['hide', 'data', 'extract'];
+  const tabs = modes.map((mode) => document.getElementById(`tab-${mode}`));
+  const forms = Object.fromEntries(modes.map((mode) => [mode, document.getElementById(`panel-${mode}`)]));
+  const downloadUrls = new Map();
+  let busy = false;
+  let capacityRequest = 0;
+
+  function formatSize(bytes) {
+    if (bytes < 1024) return `${bytes} Б`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toLocaleString('ru-RU', { maximumFractionDigits: 1 })} КБ`;
+    return `${(bytes / (1024 * 1024)).toLocaleString('ru-RU', { maximumFractionDigits: 2 })} МБ`;
+  }
+
+  function setStatus(form, message, isError = false) {
+    const node = form.querySelector('.form-status');
+    node.textContent = message;
+    node.classList.toggle('is-error', isError);
+  }
+
+  function clearResult(form) {
+    const oldUrl = downloadUrls.get(form);
+    if (oldUrl) URL.revokeObjectURL(oldUrl);
+    downloadUrls.delete(form);
+    const result = form.querySelector('.result');
+    result.hidden = true;
+    const link = result.querySelector('.download-link');
+    link.removeAttribute('href');
+    link.removeAttribute('download');
+  }
+
+  function showResult(form, blob, name, detail) {
+    clearResult(form);
+    const url = URL.createObjectURL(blob);
+    downloadUrls.set(form, url);
+    const result = form.querySelector('.result');
+    const link = result.querySelector('.download-link');
+    link.href = url;
+    link.download = name;
+    const detailNode = result.querySelector('.result-detail');
+    if (detailNode) detailNode.textContent = detail;
+    result.hidden = false;
+  }
+
+  function setBusy(value) {
+    busy = value;
+    document.querySelectorAll('input, button').forEach((control) => { control.disabled = value; });
+    document.querySelectorAll('.primary-button').forEach((button) => {
+      button.setAttribute('aria-busy', String(value));
+    });
+  }
+
+  function activateMode(mode, focus = false) {
+    if (busy) return;
+    modes.forEach((candidate, index) => {
+      const selected = candidate === mode;
+      tabs[index].setAttribute('aria-selected', String(selected));
+      tabs[index].tabIndex = selected ? 0 : -1;
+      forms[candidate].hidden = !selected;
+      if (!selected) {
+        clearResult(forms[candidate]);
+        setStatus(forms[candidate], '');
+      }
+    });
+    if (focus) document.getElementById(`tab-${mode}`).focus();
+  }
+
+  function selectedFile(inputId, label) {
+    const file = document.getElementById(inputId).files[0];
+    if (!file) throw new Error(`Выберите ${label}.`);
+    return file;
+  }
+
+  function passwordFor(mode) {
+    const password = document.getElementById(`${mode}-password`).value;
+    if (!password.trim()) throw new Error('Введите пароль. Он не может состоять только из пробелов.');
+    return password;
+  }
+
+  function checkSourceSize(file) {
+    if (file.size > MAX_FILE_SIZE) throw new Error('Файл слишком большой. Максимальный размер — 10 МБ.');
+  }
+
+  function pngName(fileName, suffix) {
+    const stem = fileName.replace(/\.[^.]+$/, '') || 'file';
+    return `${stem}-${suffix}.png`;
+  }
+
+  function restoredName(name) {
+    return name.split(/[\\/]/).pop() || 'восстановленный-файл';
+  }
+
+  function loadImage(file) {
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const image = new Image();
+      let settled = false;
+      function finish(error) {
+        if (settled) return;
+        settled = true;
+        URL.revokeObjectURL(url);
+        if (error) reject(error);
+        else resolve(image);
+      }
+      image.onload = () => finish();
+      image.onerror = () => finish(new Error('Не удалось открыть изображение. Выберите исправный файл изображения.'));
+      image.src = url;
+    });
+  }
+
+  async function imagePixels(file, flatten) {
+    const image = await loadImage(file);
+    const width = image.naturalWidth;
+    const height = image.naturalHeight;
+    if (!width || !height || width > 16384 || height > 16384 || width * height > 100000000) {
+      throw new Error('Размеры изображения не поддерживаются. Выберите картинку меньшего размера.');
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext('2d', { willReadFrequently: true });
+    if (!context) throw new Error('Браузер не смог создать холст для изображения.');
+    if (flatten) {
+      context.fillStyle = '#ffffff';
+      context.fillRect(0, 0, width, height);
+    }
+    context.drawImage(image, 0, 0);
+    return { width, height, pixels: context.getImageData(0, 0, width, height).data };
+  }
+
+  function pngBlob(width, height, pixels) {
+    return new Promise((resolve, reject) => {
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const context = canvas.getContext('2d');
+      if (!context) {
+        reject(new Error('Браузер не смог создать PNG.'));
+        return;
+      }
+      context.putImageData(new ImageData(pixels, width, height), 0, 0);
+      canvas.toBlob((blob) => {
+        if (!blob || blob.type !== 'image/png') reject(new Error('Не удалось сохранить PNG. Попробуйте другой браузер.'));
+        else resolve(blob);
+      }, 'image/png');
+    });
+  }
+
+  async function assertPng(file) {
+    const signature = new Uint8Array(await file.slice(0, 8).arrayBuffer());
+    if (!PNG_SIGNATURE.every((byte, index) => signature[index] === byte)) {
+      throw new Error('Выберите PNG, созданный этим приложением. JPEG и другие форматы не подходят.');
+    }
+  }
+
+  function friendlyError(error, mode) {
+    const message = error && error.message ? error.message : '';
+    if (message === 'Invalid image magic') return 'В этом PNG нет данных приложения. Выберите исходный PNG, полученный здесь.';
+    if (message === 'Wrong password or corrupted file packet') return 'Неверный пароль или PNG повреждён. Проверьте пароль и загрузите исходный PNG.';
+    if (/Malformed file packet|Unsupported file packet|Declared packet length|Image header exceeds capacity/.test(message)) return 'Данные в PNG повреждены или формат не поддерживается. Нужен исходный PNG без изменений.';
+    if (/Packet exceeds cover capacity/.test(message)) return 'Изображение слишком маленькое для этого файла. Выберите носитель побольше.';
+    if (/Packet exceeds image capacity|Invalid image dimensions/.test(message)) return 'Размер получившегося PNG не поддерживается. Попробуйте файл поменьше.';
+    if (/File exceeds 10 MiB limit/.test(message)) return 'Файл слишком большой. Максимальный размер — 10 МБ.';
+    if (/Web Crypto is unavailable/.test(message)) return 'В этом браузере недоступен Web Crypto. Откройте страницу в современном браузере.';
+    if (/File name or MIME type is too long/.test(message)) return 'Имя файла или его тип слишком длинные. Переименуйте файл и попробуйте снова.';
+    if (message) return message;
+    return mode === 'extract' ? 'Не удалось извлечь файл из PNG.' : 'Не удалось создать PNG. Попробуйте ещё раз.';
+  }
+
+  async function updateCoverCapacity() {
+    const request = ++capacityRequest;
+    const file = document.getElementById('hide-cover').files[0];
+    const source = document.getElementById('hide-file').files[0];
+    const box = document.getElementById('capacity-box');
+    const text = document.getElementById('capacity-text');
+    box.classList.remove('is-error');
+    if (!file) {
+      text.textContent = 'Выберите изображение, чтобы узнать его вместимость.';
+      return;
+    }
+    text.textContent = 'Проверяем размер изображения…';
+    try {
+      const image = await imagePixels(file, true);
+      if (request !== capacityRequest) return;
+      const capacity = ImageCodec.coverCapacity(image.width, image.height);
+      let message = `Размер: ${image.width} × ${image.height} пикселей. Доступно для зашифрованного пакета: ${formatSize(capacity)}.`;
+      if (source) {
+        checkSourceSize(source);
+        const needed = VaultCore.estimatePacketLength(source.size, source.name, source.type);
+        message += ` Вашему файлу нужно ${formatSize(needed)}.`;
+        if (needed > capacity) {
+          message += ' Выберите картинку большего размера.';
+          box.classList.add('is-error');
+        } else {
+          message += ' Файл поместится.';
+        }
+      }
+      text.textContent = message;
+    } catch (error) {
+      if (request !== capacityRequest) return;
+      box.classList.add('is-error');
+      text.textContent = friendlyError(error, 'hide');
+    }
+  }
+
+  async function perform(mode) {
+    const form = forms[mode];
+    clearResult(form);
+    try {
+      if (mode === 'extract') {
+        const file = selectedFile('extract-image', 'PNG');
+        const password = passwordFor(mode);
+        await assertPng(file);
+        setStatus(form, 'Открываем PNG и проверяем пароль…');
+        const image = await imagePixels(file, false);
+        const decoded = ImageCodec.decode(image.pixels, image.width, image.height);
+        const restored = await VaultCore.decryptFile(decoded.packet, password);
+        const blob = new Blob([restored.bytes], { type: restored.type || 'application/octet-stream' });
+        const name = restoredName(restored.name);
+        showResult(form, blob, name, `${name} · ${formatSize(restored.bytes.length)}`);
+        setStatus(form, 'Файл успешно восстановлен. Скачайте его ниже.');
+        return;
+      }
+
+      const file = selectedFile(`${mode}-file`, 'файл');
+      checkSourceSize(file);
+      const password = passwordFor(mode);
+      let cover;
+      if (mode === 'hide') {
+        const coverFile = selectedFile('hide-cover', 'изображение-носитель');
+        setStatus(form, 'Открываем изображение и проверяем вместимость…');
+        cover = await imagePixels(coverFile, true);
+        const required = VaultCore.estimatePacketLength(file.size, file.name, file.type);
+        if (required > ImageCodec.coverCapacity(cover.width, cover.height)) {
+          throw new Error('Изображение слишком маленькое для этого файла. Выберите носитель побольше.');
+        }
+      }
+      setStatus(form, 'Шифруем файл. Это может занять несколько секунд…');
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      const packet = await VaultCore.encryptFile({ name: file.name, type: file.type, bytes }, password);
+      const output = mode === 'hide'
+        ? { width: cover.width, height: cover.height, pixels: ImageCodec.encodeStego(packet, cover.pixels, cover.width, cover.height) }
+        : ImageCodec.encodeData(packet);
+      setStatus(form, 'Сохраняем PNG…');
+      const blob = await pngBlob(output.width, output.height, output.pixels);
+      showResult(form, blob, pngName(file.name, mode === 'hide' ? 'скрыто' : 'данные'));
+      setStatus(form, 'PNG готов. Скачайте картинку ниже.');
+    } catch (error) {
+      setStatus(form, friendlyError(error, mode), true);
+    }
+  }
+
+  function availableApis() {
+    try {
+      const canvas = document.createElement('canvas');
+      return Boolean(globalThis.crypto && crypto.subtle && crypto.getRandomValues && globalThis.File &&
+        File.prototype.arrayBuffer && globalThis.Blob && globalThis.Image && globalThis.ImageData &&
+        globalThis.URL && URL.createObjectURL && URL.revokeObjectURL && canvas.getContext &&
+        canvas.getContext('2d') && canvas.toBlob && globalThis.VaultCore && globalThis.ImageCodec);
+    } catch {
+      return false;
+    }
+  }
+
+  tabs.forEach((tab, index) => {
+    tab.addEventListener('click', () => activateMode(modes[index]));
+    tab.addEventListener('keydown', (event) => {
+      const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
+      if (step) {
+        event.preventDefault();
+        activateMode(modes[(index + step + modes.length) % modes.length], true);
+      } else if (event.key === 'Home' || event.key === 'End') {
+        event.preventDefault();
+        activateMode(event.key === 'Home' ? modes[0] : modes[modes.length - 1], true);
+      }
+    });
+  });
+
+  document.querySelectorAll('.password-toggle').forEach((toggle) => {
+    toggle.addEventListener('click', () => {
+      const input = document.getElementById(toggle.getAttribute('aria-controls'));
+      const showing = input.type === 'password';
+      input.type = showing ? 'text' : 'password';
+      toggle.textContent = showing ? 'Скрыть' : 'Показать';
+      toggle.setAttribute('aria-label', showing ? 'Скрыть пароль' : 'Показать пароль');
+      input.focus();
+    });
+  });
+
+  document.querySelectorAll('input[type=file]').forEach((input) => {
+    input.addEventListener('change', () => {
+      const form = input.closest('form');
+      clearResult(form);
+      setStatus(form, '');
+      const info = document.getElementById(`${input.id}-info`);
+      const file = input.files[0];
+      info.textContent = file ? `${file.name} · ${formatSize(file.size)}` : '';
+      if (input.id === 'hide-file' || input.id === 'hide-cover') updateCoverCapacity();
+    });
+  });
+  document.querySelectorAll('input[type=password]').forEach((input) => {
+    input.addEventListener('input', () => {
+      clearResult(input.closest('form'));
+      setStatus(input.closest('form'), '');
+    });
+  });
+  modes.forEach((mode) => forms[mode].addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (busy) return;
+    setBusy(true);
+    try { await perform(mode); }
+    finally { setBusy(false); }
+  }));
+
+  if (!availableApis()) {
+    document.querySelectorAll('input, button').forEach((control) => { control.disabled = true; });
+    setStatus(forms.hide, 'Этот браузер не поддерживает необходимые функции: Web Crypto, File API или Canvas. Откройте страницу в современном браузере.', true);
+  }
+  window.addEventListener('beforeunload', () => downloadUrls.forEach((url) => URL.revokeObjectURL(url)));
+})();
+
+</script>
 </body>
 </html>
