@@ -12,8 +12,8 @@
 
   function formatSize(bytes) {
     if (bytes < 1024) return `${bytes} Б`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toLocaleString('ru-RU', { maximumFractionDigits: 1 })} КБ`;
-    return `${(bytes / (1024 * 1024)).toLocaleString('ru-RU', { maximumFractionDigits: 2 })} МБ`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toLocaleString('ru-RU', { maximumFractionDigits: 1 })} КиБ`;
+    return `${(bytes / (1024 * 1024)).toLocaleString('ru-RU', { maximumFractionDigits: 2 })} МиБ`;
   }
 
   function setStatus(form, message, isError = false) {
@@ -23,35 +23,101 @@
   }
 
   function clearResult(form) {
-    const oldUrl = downloadUrls.get(form);
-    if (oldUrl) URL.revokeObjectURL(oldUrl);
+    for (const url of downloadUrls.get(form) || []) URL.revokeObjectURL(url);
     downloadUrls.delete(form);
     const result = form.querySelector('.result');
     result.hidden = true;
-    const link = result.querySelector('.download-link');
-    link.removeAttribute('href');
-    link.removeAttribute('download');
+    const list = result.querySelector('.result-list');
+    if (list) list.replaceChildren();
+    result.querySelectorAll('.download-link').forEach(link => {
+      link.removeAttribute('href'); link.removeAttribute('download');
+    });
   }
 
   function showResult(form, blob, name, detail) {
     clearResult(form);
     const url = URL.createObjectURL(blob);
-    downloadUrls.set(form, url);
-    const result = form.querySelector('.result');
-    const link = result.querySelector('.download-link');
-    link.href = url;
-    link.download = name;
+    downloadUrls.set(form, [url]);
+    const result = form.querySelector('.result'), link = result.querySelector('.download-link');
+    link.href = url; link.download = name;
     const detailNode = result.querySelector('.result-detail');
     if (detailNode) detailNode.textContent = detail;
     result.hidden = false;
   }
 
+  function showResults(form, entries) {
+    clearResult(form);
+    const urls = [];
+    downloadUrls.set(form, urls);
+    const result = form.querySelector('.result'), list = result.querySelector('.result-list');
+    try {
+      for (const entry of entries) {
+        const url = URL.createObjectURL(entry.blob); urls.push(url);
+        const row = document.createElement('li'), info = document.createElement('div');
+        info.className = 'result-file';
+        const name = document.createElement('strong'), detail = document.createElement('p'), link = document.createElement('a');
+        name.textContent = entry.name; detail.textContent = entry.detail;
+        info.append(name, detail); link.className = 'download-link'; link.href = url; link.download = entry.name; link.textContent = 'Скачать PNG ↓';
+        row.append(info, link); list.append(row);
+      }
+      result.hidden = false;
+    } catch (error) { clearResult(form); throw error; }
+  }
+
+  function syncSplitFields() {
+    const mode = document.getElementById('data-split-mode').value;
+    document.getElementById('data-count-field').hidden = mode !== 'count';
+    document.getElementById('data-size-field').hidden = mode !== 'size';
+    document.getElementById('data-part-count').disabled = busy || mode !== 'count';
+    document.getElementById('data-part-size').disabled = busy || mode !== 'size';
+    document.getElementById('data-part-unit').disabled = busy || mode !== 'size';
+  }
+
+  function readSplitOptions() {
+    const mode = document.getElementById('data-split-mode').value;
+    if (mode === 'size') return { mode, partSize: FileParts.parsePartSize(document.getElementById('data-part-size').value, document.getElementById('data-part-unit').value) };
+    if (mode === 'count') {
+      const value = document.getElementById('data-part-count').value.trim();
+      return {mode, count: /^[0-9]+$/.test(value) ? Number(value) : NaN};
+    }
+    return {mode};
+  }
+
+  function updateSplitPreview() {
+    syncSplitFields();
+    const node = document.getElementById('data-split-summary'), file = document.getElementById('data-file').files[0];
+    node.classList.toggle('is-error', false);
+    if (!file) { node.textContent = 'Выберите файл, чтобы увидеть расчёт частей.'; return; }
+    try {
+      const options = readSplitOptions(), parts = FileParts.planParts(file.size, options);
+      const min = Math.min(...parts.map(p=>p.length)), max = Math.max(...parts.map(p=>p.length));
+      const size = min === max ? formatSize(max) : `${formatSize(min)}–${formatSize(max)}`;
+      node.textContent = `Частей: ${parts.length}. Исходные данные в части: ${size}.` + (options.mode === 'size' ? ` Последняя часть: ${formatSize(parts[parts.length - 1].length)}.` : '') + ' Готовые PNG будут больше.';
+    } catch (error) { node.classList.toggle('is-error', true); node.textContent = friendlyError(error, 'data'); }
+  }
+
+  async function createDataPngs(file, password, options) {
+    const parts = FileParts.planParts(file.size, options), session = await VaultCore.createEncryptSession(password);
+    const entries = [], width = Math.max(3, String(parts.length).length);
+    const stem = restoredName(file.name).replace(/\.[^.]+$/, '') || 'file';
+    for (const part of parts) {
+      setStatus(forms.data, `Создаём PNG: часть ${part.index + 1} из ${parts.length}…`);
+      const bytes = new Uint8Array(await file.slice(part.offset, part.offset + part.length).arrayBuffer());
+      const packet = await session.encryptPart({name:file.name,type:file.type,index:part.index,count:parts.length,totalSize:file.size,offset:part.offset,bytes});
+      const image = ImageCodec.encodeData(packet), blob = await pngBlob(image.width, image.height, image.pixels);
+      const name = options.mode === 'single' ? pngName(restoredName(file.name), 'данные') : `${stem}.part-${String(part.index + 1).padStart(width,'0')}-of-${String(parts.length).padStart(width,'0')}.png`;
+      entries.push({blob,name,detail:formatSize(blob.size)});
+    }
+    return entries;
+  }
+
   function setBusy(value) {
     busy = value;
-    document.querySelectorAll('input, button').forEach((control) => { control.disabled = value; });
+    document.querySelectorAll('input, button, select').forEach((control) => { control.disabled = value; });
     document.querySelectorAll('.primary-button').forEach((button) => {
       button.setAttribute('aria-busy', String(value));
     });
+    syncSplitFields();
   }
 
   function activateMode(mode, focus = false) {
@@ -129,24 +195,25 @@
       context.fillRect(0, 0, width, height);
     }
     context.drawImage(image, 0, 0);
-    return { width, height, pixels: context.getImageData(0, 0, width, height).data };
+    try { return { width, height, pixels: context.getImageData(0, 0, width, height).data }; }
+    finally { canvas.width = 1; canvas.height = 1; }
   }
 
   function pngBlob(width, height, pixels) {
     return new Promise((resolve, reject) => {
       const canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
-      const context = canvas.getContext('2d');
-      if (!context) {
-        reject(new Error('Браузер не смог создать PNG.'));
-        return;
-      }
-      context.putImageData(new ImageData(pixels, width, height), 0, 0);
-      canvas.toBlob((blob) => {
-        if (!blob || blob.type !== 'image/png') reject(new Error('Не удалось сохранить PNG. Попробуйте другой браузер.'));
-        else resolve(blob);
-      }, 'image/png');
+      const release = () => { canvas.width = 1; canvas.height = 1; };
+      canvas.width = width; canvas.height = height;
+      try {
+        const context = canvas.getContext('2d');
+        if (!context) throw new Error('Браузер не смог создать PNG.');
+        context.putImageData(new ImageData(pixels, width, height), 0, 0);
+        canvas.toBlob(blob => {
+          release();
+          if (!blob || blob.type !== 'image/png') reject(new Error('Не удалось сохранить PNG. Попробуйте другой браузер или уменьшите размер части.'));
+          else resolve(blob);
+        }, 'image/png');
+      } catch (error) { release(); reject(error); }
     });
   }
 
@@ -226,6 +293,14 @@
         return;
       }
 
+      if (mode === 'data') {
+        const file = selectedFile('data-file', 'файл'), password = passwordFor(mode);
+        const entries = await createDataPngs(file, password, readSplitOptions());
+        showResults(form, entries);
+        setStatus(form, `Готово PNG: ${entries.length}. Скачайте все части ниже.`);
+        return;
+      }
+
       const file = selectedFile(`${mode}-file`, 'файл');
       checkSourceSize(file);
       const password = passwordFor(mode);
@@ -250,6 +325,7 @@
       showResult(form, blob, pngName(file.name, mode === 'hide' ? 'скрыто' : 'данные'));
       setStatus(form, 'PNG готов. Скачайте картинку ниже.');
     } catch (error) {
+      clearResult(form);
       setStatus(form, friendlyError(error, mode), true);
     }
   }
@@ -260,7 +336,7 @@
       return Boolean(globalThis.crypto && crypto.subtle && crypto.getRandomValues && globalThis.File &&
         File.prototype.arrayBuffer && globalThis.Blob && globalThis.Image && globalThis.ImageData &&
         globalThis.URL && URL.createObjectURL && URL.revokeObjectURL && canvas.getContext &&
-        canvas.getContext('2d') && canvas.toBlob && globalThis.VaultCore && globalThis.ImageCodec);
+        canvas.getContext('2d') && canvas.toBlob && globalThis.VaultCore && globalThis.ImageCodec && globalThis.FileParts);
     } catch {
       return false;
     }
@@ -299,6 +375,7 @@
       const info = document.getElementById(`${input.id}-info`);
       const file = input.files[0];
       info.textContent = file ? `${file.name} · ${formatSize(file.size)}` : '';
+      if (input.id === 'data-file') updateSplitPreview();
       if (input.id === 'hide-file' || input.id === 'hide-cover') updateCoverCapacity();
     });
   });
@@ -308,6 +385,12 @@
       setStatus(input.closest('form'), '');
     });
   });
+  ['data-split-mode','data-part-count','data-part-size','data-part-unit'].forEach(id => {
+    const input = document.getElementById(id);
+    const event = input.tagName === 'SELECT' ? 'change' : 'input';
+    input.addEventListener(event, () => { clearResult(forms.data); setStatus(forms.data, ''); updateSplitPreview(); });
+  });
+  updateSplitPreview();
   modes.forEach((mode) => forms[mode].addEventListener('submit', async (event) => {
     event.preventDefault();
     if (busy) return;
@@ -317,8 +400,8 @@
   }));
 
   if (!availableApis()) {
-    document.querySelectorAll('input, button').forEach((control) => { control.disabled = true; });
+    document.querySelectorAll('input, button, select').forEach((control) => { control.disabled = true; });
     setStatus(forms.hide, 'Этот браузер не поддерживает необходимые функции: Web Crypto, File API или Canvas. Откройте страницу в современном браузере.', true);
   }
-  window.addEventListener('beforeunload', () => downloadUrls.forEach((url) => URL.revokeObjectURL(url)));
+  window.addEventListener('beforeunload', () => downloadUrls.forEach(urls => urls.forEach(url => URL.revokeObjectURL(url))));
 })();
