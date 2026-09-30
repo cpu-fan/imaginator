@@ -36,3 +36,23 @@ test('built HTML works without local CSS or JavaScript files', async () => {
   assert.equal(restored.name, 'sample.bin');
   assert.deepEqual(restored.bytes, source);
 });
+
+
+test('embedded modules restore a reordered multipart file without external scripts', async () => {
+  const html = readFileSync(path.join(projectRoot, 'index.html'), 'utf8');
+  const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(match => match[1]);
+  const context = vm.createContext({TextEncoder,TextDecoder,Uint8Array,Uint8ClampedArray,crypto:webcrypto});
+  for (const script of scripts.slice(0,3)) vm.runInContext(script, context);
+  const source = Uint8Array.of(0,255,42,7,8), session = await context.VaultCore.createEncryptSession('secret');
+  const images = [];
+  for (const range of context.FileParts.planParts(5,{mode:'count',count:3})) {
+    const packet = await session.encryptPart({name:'original.bin',type:'application/octet-stream',index:range.index,count:3,totalSize:5,offset:range.offset,bytes:source.slice(range.offset,range.offset+range.length)});
+    images.push(context.ImageCodec.encodeData(packet));
+  }
+  const decrypt = context.VaultCore.createDecryptSession('secret'), parts = [];
+  for (const image of images.reverse()) parts.push(await decrypt.decryptPacket(context.ImageCodec.decode(image.pixels,image.width,image.height).packet));
+  const ordered = context.FileParts.validateSet(parts), blob = new Blob(ordered.map(part=>part.bytes),{type:ordered[0].type});
+  assert.equal(ordered[0].name,'original.bin');
+  assert.equal(blob.type,'application/octet-stream');
+  assert.deepEqual([...new Uint8Array(await blob.arrayBuffer())],[0,255,42,7,8]);
+});

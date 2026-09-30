@@ -80,3 +80,7 @@ test('failed restored Blob is cleared and the next attempt succeeds',async()=>{
  let calls=0;class FailingBlob extends Blob {constructor(...args){calls++;if(calls===1)throw new RangeError('Blob allocation failed');super(...args);}}
  const h=createAppHarness({globals:{Blob:FailingBlob}});await extract(h,pngSet());assert.equal(h.hasResult('extract'),false);assert.equal(h.activeUrls.size,0);assert.equal(h.controlsDisabled(),false);await extract(h,pngSet());assert.equal(h.entries('extract').length,1);h.unload();
 });
+
+for (const globals of [{crypto:null},{File:null}]) test('missing browser API disables all form controls '+Object.keys(globals)[0],()=>{
+ const h=createAppHarness({globals});assert.equal(h.controlsDisabled(),true);assert.match(h.status('hide'),/не поддерживает/);
+});
