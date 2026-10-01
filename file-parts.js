@@ -14,25 +14,25 @@
   }
   function parsePartSize(value, unit) {
     if (typeof value !== 'string' || !/^(?:[0-9]+(?:[.,][0-9]+)?|[.,][0-9]+)$/.test(value.trim()) || !['KiB','MiB'].includes(unit)) {
-      fail('INVALID_SPLIT', 'Введите положительный размер части в КиБ или МБ.');
+      fail('INVALID_SPLIT', 'Введите положительный размер части в kB или MB.');
     }
     const size = Math.floor(Number(value.trim().replace(',', '.')) * (unit === 'KiB' ? 1024 : 1048576));
-    if (!integer(size, 1, MAX_PART_SIZE)) fail('INVALID_SPLIT', 'Размер части должен быть от 1 байта до 64 МБ.');
+    if (!integer(size, 1, MAX_PART_SIZE)) fail('INVALID_SPLIT', 'Размер части должен быть от 1 байта до 64 MB.');
     return size;
   }
   function planParts(totalSize, options) {
-    if (!integer(totalSize, 0, MAX_SOURCE_SIZE)) fail('INVALID_SPLIT', 'Размер исходного файла не должен превышать 512 МБ.');
+    if (!integer(totalSize, 0, MAX_SOURCE_SIZE)) fail('INVALID_SPLIT', 'Размер исходного файла не должен превышать 512 MB.');
     if (!options || !['single','count','size'].includes(options.mode)) fail('INVALID_SPLIT', 'Выберите способ разбивки.');
     let count;
     if (options.mode === 'size') {
-      if (!integer(options.partSize, 1, MAX_PART_SIZE)) fail('INVALID_SPLIT', 'Размер части должен быть от 1 байта до 64 МБ.');
+      if (!integer(options.partSize, 1, MAX_PART_SIZE)) fail('INVALID_SPLIT', 'Размер части должен быть от 1 байта до 64 MB.');
       count = Math.max(1, Math.ceil(totalSize / options.partSize));
     } else count = options.mode === 'single' ? 1 : options.count;
     if (!integer(count, 1, MAX_PART_COUNT)) fail('INVALID_SPLIT', 'Нужно от 1 до 1000 частей. Увеличьте размер части или уменьшите количество.');
     if ((totalSize === 0 && count !== 1) || (totalSize > 0 && count > totalSize)) fail('INVALID_SPLIT', 'Количество частей не может превышать число байтов файла. Для пустого файла нужна одна часть.');
     const q = Math.floor(totalSize / count), r = totalSize % count;
     const largest = options.mode === 'size' ? Math.min(totalSize, options.partSize) : q + (r ? 1 : 0);
-    if (largest > MAX_PART_SIZE) fail('INVALID_SPLIT', 'В одной части не должно быть больше 64 МБ. Выберите разбивку или увеличьте количество частей.');
+    if (largest > MAX_PART_SIZE) fail('INVALID_SPLIT', 'В одной части не должно быть больше 64 MB. Выберите разбивку или увеличьте количество частей.');
     return Array.from({length:count}, (_, index) => options.mode === 'size'
       ? {index,offset:index * options.partSize,length:Math.min(options.partSize, totalSize - index * options.partSize)}
       : {index,offset:index * q + Math.min(index,r),length:q + (index < r ? 1 : 0)});

@@ -1,9 +1,10 @@
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const {webcrypto}=require('node:crypto');
 class Element {
- constructor(tag,attrs={}){this.tagName=tag.toUpperCase();this.attrs=attrs;this.children=[];this.parentElement=null;this.listeners={};this.value=attrs.value||'';this.files=[];this.disabled='disabled'in attrs;this.hidden='hidden'in attrs;this._text='';this.classes=new Set((attrs.class||'').split(/ +/).filter(Boolean));this.classList={toggle:(name,value)=>value?this.classes.add(name):this.classes.delete(name),contains:name=>this.classes.has(name),add:name=>this.classes.add(name),remove:name=>this.classes.delete(name)};}
+ constructor(tag,attrs={}){this.tagName=tag.toUpperCase();this.attrs=attrs;this.children=[];this.parentElement=null;this.listeners={};this.value=attrs.value||'';this.files=[];this.checked='checked'in attrs;this.disabled='disabled'in attrs;this.hidden='hidden'in attrs;this._text='';this.classes=new Set((attrs.class||'').split(/ +/).filter(Boolean));this.classList={toggle:(name,value)=>value?this.classes.add(name):this.classes.delete(name),contains:name=>this.classes.has(name),add:name=>this.classes.add(name),remove:name=>this.classes.delete(name)};}
  get className(){return [...this.classes].join(' ');}set className(value){this.classes=new Set(String(value).split(/ +/).filter(Boolean));}
  get id(){return this.attrs.id||'';}get type(){return this.attrs.type||'';}set type(value){this.attrs.type=value;}
+ get value(){return this._value||'';}set value(value){this._value=String(value);if(this.type==='file'&&value==='')this.files=[];}
  get textContent(){return this._text+this.children.map(c=>c.textContent).join('');}set textContent(value){this._text=String(value);this.children=[];}
  append(...nodes){for(const node of nodes){node.parentElement=this;this.children.push(node);}}appendChild(node){this.append(node);return node;}
  replaceChildren(...nodes){this.children=[];this._text='';this.append(...nodes);}removeAttribute(key){delete this.attrs[key];delete this[key];}setAttribute(key,value){this.attrs[key]=String(value);}getAttribute(key){return this.attrs[key]??null;}focus(){}
@@ -29,6 +30,7 @@ function parseTemplate(html){
 function createAppHarness(overrides={}){
  const root=parseTemplate(fs.readFileSync(path.join(__dirname,'../../index.template.html'),'utf8'));
  const nodes=new Map();const all=(node)=>{if(node.id)nodes.set(node.id,node);node.children.forEach(all);};all(root);
+ if(overrides.directorySupport!==false)for(const input of root.querySelectorAll('input[type=file]'))input.webkitdirectory='webkitdirectory'in input.attrs;
  const activeUrls=new Map(),revokedUrls=new Set();let urlCount=0,pngCount=0;const listeners={};
  const faults={...overrides.faults};
  const url={createObjectURL(blob){urlCount++;if(faults.urlAt===urlCount)throw new Error('URL allocation failed');const name='blob:test-'+urlCount;activeUrls.set(name,blob);return name;},revokeObjectURL(name){revokedUrls.add(name);activeUrls.delete(name);}};
@@ -37,7 +39,7 @@ function createAppHarness(overrides={}){
  class ImageData {constructor(data,width,height){this.data=data;this.width=width;this.height=height;}}
  const document={getElementById:id=>nodes.get(id)||null,querySelectorAll:s=>root.querySelectorAll(s),createElement:tag=>tag==='canvas'?canvas():new Element(tag)};
  const context=vm.createContext({document,window:{addEventListener(type,fn){(listeners[type]??=[]).push(fn);}},crypto:webcrypto,File,Blob,Image,ImageData,URL:url,TextEncoder,TextDecoder,Uint8Array,Uint8ClampedArray,queueMicrotask,console,...overrides.globals});
- for(const name of ['file-parts.js','vault-core.js','image-codec.js'])vm.runInContext(fs.readFileSync(path.join(__dirname,'../..',name),'utf8'),context);
+ for(const name of ['file-parts.js','vault-core.js','image-codec.js','directory-zip.js'])vm.runInContext(fs.readFileSync(path.join(__dirname,'../..',name),'utf8'),context);
  if(overrides.vaultCore)context.VaultCore=overrides.vaultCore(context.VaultCore);
  if(overrides.imageCodec)context.ImageCodec=overrides.imageCodec(context.ImageCodec);
  vm.runInContext(fs.readFileSync(path.join(__dirname,'../../app.js'),'utf8'),context);
@@ -45,7 +47,7 @@ function createAppHarness(overrides={}){
  return {nodes,context,faults,activeUrls,revokedUrls,
   downloads(){return root.querySelectorAll('.download-link').filter(a=>a.clickCount).map(a=>({name:a.download,blob:activeUrls.get(a.href)}));},
   async setFiles(id,files){nodes.get(id).files=files;await dispatch(id,'change');},
-  async setValue(id,value,type='input'){const node=nodes.get(id);if(!node)throw new Error('Missing UI control: '+id);node.value=String(value);await dispatch(id,type);},dispatch,
+  async setValue(id,value,type='input'){const node=nodes.get(id);if(!node)throw new Error('Missing UI control: '+id);if(node.tagName==='FIELDSET'){const radios=node.querySelectorAll('input[type=radio]'),radio=radios.find(input=>input.value===String(value));if(!radio)throw new Error('Missing radio choice: '+value);if(radio.disabled||radio.checked)return;radios.forEach(input=>input.checked=input===radio);await radio.fire('change');return;}node.value=String(value);await dispatch(id,type);},dispatch,
   submit:mode=>dispatch('panel-'+mode,'submit'),
   entries(mode){const form=nodes.get('panel-'+mode);return form.querySelectorAll('.download-link').filter(a=>a.href).map(a=>({name:a.download,blob:activeUrls.get(a.href)}));},
   status:mode=>nodes.get('panel-'+mode).querySelector('.form-status').textContent,

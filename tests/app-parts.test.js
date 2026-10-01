@@ -1,8 +1,17 @@
 const test=require('node:test'),assert=require('node:assert/strict');
 const {createAppHarness}=require('./helpers/app-harness.js');
 async function configured(h){await h.setFiles('data-file',[new File([Uint8Array.of(0,1,2,3,4,5,6)],'sample.bin',{type:'application/octet-stream'})]);await h.setValue('data-password','secret');await h.setValue('data-split-mode','count','change');await h.setValue('data-part-count','3');}
+test('source sizes and split previews use Latin kB and MB labels',async()=>{
+ const h=createAppHarness();
+ await h.setFiles('data-file',[{name:'small.bin',size:2048}]);
+ assert.match(h.nodes.get('data-file-info').textContent,/2 kB/);
+ assert.match(h.nodes.get('data-split-summary').textContent,/2 kB/);
+ await h.setFiles('data-file',[{name:'large.bin',size:2*1048576}]);
+ assert.match(h.nodes.get('data-file-info').textContent,/2 MB/);
+ assert.match(h.nodes.get('data-split-summary').textContent,/2 MB/);
+});
 test('preview supports count size decimal units and invalid parameters',async()=>{
- const h=createAppHarness();assert.equal(h.nodes.get('data-split-mode').value,'single');assert.equal(h.nodes.get('data-count-field').hidden,true);assert.equal(h.nodes.get('data-size-field').hidden,true);
+ const h=createAppHarness();assert.equal(h.nodes.get('data-pack-single').checked,true);assert.equal(h.nodes.get('data-count-field').hidden,true);assert.equal(h.nodes.get('data-size-field').hidden,true);
  await h.setFiles('data-file',[{name:'large.bin',size:37*1048576}]);await h.setValue('data-split-mode','count','change');assert.match(h.nodes.get('data-split-summary').textContent,/4/);assert.match(h.nodes.get('data-split-summary').textContent,/9,25/);
  await h.setValue('data-split-mode','size','change');await h.setValue('data-part-size','20');assert.match(h.nodes.get('data-split-summary').textContent,/17/);assert.match(h.nodes.get('data-split-summary').textContent,/20/);
  await h.setFiles('data-file',[{name:'small.bin',size:2048}]);await h.setValue('data-part-size','0,5');await h.setValue('data-part-unit','KiB','change');assert.match(h.nodes.get('data-split-summary').textContent,/4/);
@@ -16,7 +25,7 @@ test('creation slices data sequentially and publishes only a complete set',async
  assert.deepEqual(slices,[[0,3],[3,5],[5,7]]);assert.equal(sessions,1);assert.equal(max,1);assert.deepEqual(h.entries('data').map(e=>e.name),['sample.part-001-of-003.png','sample.part-002-of-003.png','sample.part-003-of-003.png']);assert.equal(h.entries('data').every(e=>e.blob.type==='image/png'),true);h.unload();assert.equal(h.activeUrls.size,0);
 });
 test('single output keeps its name and 1000 parts use four digits',async()=>{
- const h=createAppHarness();await configured(h);await h.setValue('data-split-mode','single','change');await h.submit('data');assert.equal(h.entries('data')[0].name,'sample-данные.png');
+ const h=createAppHarness();await configured(h);await h.setValue('data-split-mode','single','change');await h.submit('data');assert.equal(h.entries('data')[0].name,'sample.png');
  await h.setFiles('data-file',[new File([new Uint8Array(1000)],'sample.bin')]);await h.setValue('data-split-mode','count','change');await h.setValue('data-part-count','1000');await h.submit('data');assert.equal(h.entries('data')[0].name,'sample.part-0001-of-1000.png');assert.equal(h.entries('data')[999].name,'sample.part-1000-of-1000.png');h.unload();assert.equal(h.activeUrls.size,0);
 });
 for(const id of ['data-password','data-split-mode','data-part-count','data-part-size','data-part-unit'])test('changing '+id+' revokes every output URL',async()=>{
@@ -85,7 +94,7 @@ for (const globals of [{crypto:null},{File:null}]) test('missing browser API dis
  const h=createAppHarness({globals});assert.equal(h.controlsDisabled(),true);assert.match(h.status('hide'),/не поддерживает/);
 });
 
-for (const [mode,names] of [['single',['sample-данные.png']],['count',['sample.part-001-of-003.png','sample.part-002-of-003.png','sample.part-003-of-003.png']]]) test('creation automatically downloads complete PNG output '+mode,async()=>{
+for (const [mode,names] of [['single',['sample.png']],['count',['sample.part-001-of-003.png','sample.part-002-of-003.png','sample.part-003-of-003.png']]]) test('creation automatically downloads complete PNG output '+mode,async()=>{
  const h=createAppHarness();await configured(h);await h.setValue('data-split-mode',mode,'change');await h.submit('data');
  assert.deepEqual(h.downloads().map(e=>e.name),names);assert.equal(h.downloads().every(e=>e.blob.type==='image/png'),true);h.unload();
 });

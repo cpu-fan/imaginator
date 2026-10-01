@@ -23,7 +23,7 @@
         <div class="intro-copy">
           <p class="eyebrow">Локальный сейф для файлов</p>
           <h1 id="page-title">Спрячьте важное<br><em>в обычном PNG.</em></h1>
-          <p class="intro-lead">Выберите файл, задайте пароль и скачайте картинку. Чтобы вернуть файл, откройте эту страницу снова — интернет не нужен.</p>
+          <p class="intro-lead">Выберите файл или папку, задайте пароль и скачайте картинку. Чтобы вернуть данные, откройте эту страницу снова — интернет не нужен.</p>
           <div class="trust-line"><span class="trust-icon" aria-hidden="true">↗</span><span>Файлы и пароль остаются на вашем устройстве</span></div>
         </div>
         <div class="hero-art" aria-hidden="true">
@@ -50,8 +50,13 @@
         <div class="form-card">
           <form id="panel-hide" role="tabpanel" aria-labelledby="tab-hide" hidden novalidate>
             <div class="form-heading"><span class="form-number">01</span><div><h3>Скрыть файл в изображении</h3><p>Внешний вид картинки почти не изменится. Нужен достаточно большой носитель.</p></div></div>
+            <fieldset class="field choice-group source-kind" id="hide-source-kind"><legend>Что зашифровать</legend><div class="choice-options source-options">
+              <label class="choice-option"><input id="hide-source-file" type="radio" name="hide-source-kind" value="file" checked><span class="choice-face">Файл</span></label>
+              <label class="choice-option"><input id="hide-folder-option" type="radio" name="hide-source-kind" value="folder" aria-describedby="hide-source-hint"><span class="choice-face">Папка → ZIP</span></label>
+            </div><p class="field-hint" id="hide-source-hint" hidden>Выбор папки не поддерживается этим браузером.</p></fieldset>
             <div class="field-grid">
-              <div class="field"><label for="hide-file">Файл для шифрования <span class="required">*</span></label><input id="hide-file" name="file" type="file" required aria-describedby="hide-file-hint hide-file-info"><p class="field-hint" id="hide-file-hint">До 10 МБ. Подойдёт и пустой файл.</p><p class="file-info" id="hide-file-info"></p></div>
+              <div class="field" id="hide-file-field"><label for="hide-file">Файл для шифрования <span class="required">*</span></label><input id="hide-file" name="file" type="file" required aria-describedby="hide-file-hint hide-file-info"><p class="field-hint" id="hide-file-hint">До 10 MB. Подойдёт и пустой файл.</p><p class="file-info" id="hide-file-info"></p></div>
+              <div class="field" id="hide-folder-field" hidden><label for="hide-folder">Папка для шифрования <span class="required">*</span></label><input id="hide-folder" name="folder" type="file" webkitdirectory multiple disabled aria-describedby="hide-folder-hint hide-folder-info"><p class="field-hint" id="hide-folder-hint">Папка будет упакована в ZIP без сжатия. До 10 MB вместе со служебными данными ZIP. Пустые папки не сохраняются. После извлечения скачивается ZIP.</p><p class="file-info" id="hide-folder-info"></p></div>
               <div class="field"><label for="hide-cover">Изображение-носитель <span class="required">*</span></label><input id="hide-cover" name="cover" type="file" accept="image/*" required aria-describedby="hide-cover-hint hide-cover-info"><p class="field-hint" id="hide-cover-hint">PNG, JPEG или другое изображение, которое открывает браузер.</p><p class="file-info" id="hide-cover-info"></p></div>
             </div>
             <div class="capacity-box" id="capacity-box"><span class="capacity-symbol" aria-hidden="true">▧</span><span id="capacity-text">Выберите изображение, чтобы узнать его вместимость.</span></div>
@@ -62,13 +67,22 @@
 
           <form id="panel-data" role="tabpanel" aria-labelledby="tab-data" novalidate>
             <div class="form-heading"><span class="form-number">02</span><div><h3>Создать картинку с данными</h3><p>Создайте один PNG или разделите файл на несколько картинок.</p></div></div>
-            <div class="field"><label for="data-file">Файл для шифрования <span class="required">*</span></label><input id="data-file" name="file" type="file" required aria-describedby="data-file-hint data-file-info"><p class="field-hint" id="data-file-hint">До 512 МБ на файл. До 64 МБ исходных данных в одном PNG.</p><p class="file-info" id="data-file-info"></p></div>
+            <fieldset class="field choice-group source-kind" id="data-source-kind"><legend>Что зашифровать</legend><div class="choice-options source-options">
+              <label class="choice-option"><input id="data-source-file" type="radio" name="data-source-kind" value="file" checked><span class="choice-face">Файл</span></label>
+              <label class="choice-option"><input id="data-folder-option" type="radio" name="data-source-kind" value="folder" aria-describedby="data-source-hint"><span class="choice-face">Папка → ZIP</span></label>
+            </div><p class="field-hint" id="data-source-hint" hidden>Выбор папки не поддерживается этим браузером.</p></fieldset>
+            <div class="field" id="data-file-field"><label for="data-file">Файл для шифрования <span class="required">*</span></label><input id="data-file" name="file" type="file" required aria-describedby="data-file-hint data-file-info"><p class="field-hint" id="data-file-hint">До 512 MB на файл. До 64 MB исходных данных в одном PNG.</p><p class="file-info" id="data-file-info"></p></div>
+            <div class="field" id="data-folder-field" hidden><label for="data-folder">Папка для шифрования <span class="required">*</span></label><input id="data-folder" name="folder" type="file" webkitdirectory multiple disabled aria-describedby="data-folder-hint data-folder-info"><p class="field-hint" id="data-folder-hint">Папка будет упакована в ZIP без сжатия. До 512 MB вместе со служебными данными ZIP; до 64 MB в одном PNG. Пустые папки не сохраняются. После извлечения скачивается ZIP.</p><p class="file-info" id="data-folder-info"></p></div>
+            <fieldset class="field choice-group packing-kind" id="data-split-mode" aria-describedby="data-split-hint"><legend>Способ упаковки</legend><div class="choice-options packing-options">
+              <label class="choice-option"><input id="data-pack-single" type="radio" name="data-split-mode" value="single" checked><span class="choice-face"><strong>Один PNG</strong><span class="choice-description">Весь файл в одной картинке</span></span></label>
+              <label class="choice-option"><input id="data-pack-count" type="radio" name="data-split-mode" value="count"><span class="choice-face"><strong>По количеству частей</strong><span class="choice-description">Задайте, сколько PNG создать</span></span></label>
+              <label class="choice-option"><input id="data-pack-size" type="radio" name="data-split-mode" value="size"><span class="choice-face"><strong>По размеру части</strong><span class="choice-description">Задайте объём данных в PNG</span></span></label>
+            </div></fieldset>
             <div class="split-settings">
-              <div class="field"><label for="data-split-mode">Способ упаковки</label><select id="data-split-mode" aria-describedby="data-split-hint"><option value="single">Один PNG</option><option value="count">По количеству частей</option><option value="size">По размеру части</option></select></div>
               <div class="field" id="data-count-field" hidden><label for="data-part-count">Количество частей</label><input id="data-part-count" type="number" min="1" max="1000" step="1" value="4" disabled aria-describedby="data-split-summary"></div>
-              <div class="field" id="data-size-field" hidden><label for="data-part-size">Размер исходных данных в части</label><div class="part-size-inputs"><input id="data-part-size" type="text" inputmode="decimal" value="10" disabled aria-describedby="data-split-hint data-split-summary"><select id="data-part-unit" aria-label="Единица размера части" disabled><option value="KiB">КиБ</option><option value="MiB" selected>МБ</option></select></div></div>
+              <div class="field" id="data-size-field" hidden><label for="data-part-size">Размер исходных данных в части</label><div class="part-size-inputs"><input id="data-part-size" type="text" inputmode="decimal" value="10" disabled aria-describedby="data-split-hint data-split-summary"><select id="data-part-unit" aria-label="Единица размера части" disabled><option value="KiB">kB</option><option value="MiB" selected>MB</option></select></div></div>
             </div>
-            <p class="field-hint" id="data-split-hint">Размер относится к исходным данным: готовые PNG будут больше. 1 КиБ = 1024 байта, 1 МБ = 1024 × 1024 байт. Максимум 1000 частей.</p>
+            <p class="field-hint" id="data-split-hint">Размер относится к исходным данным: готовые PNG будут больше. 1 kB = 1024 байта, 1 MB = 1024 × 1024 байт. Максимум 1000 частей.</p>
             <p class="split-summary" id="data-split-summary" role="status" aria-live="polite">Выберите файл, чтобы увидеть расчёт частей.</p>
             <div class="field password-field"><label for="data-password">Пароль <span class="required">*</span></label><div class="password-wrap"><input id="data-password" name="password" type="password" autocomplete="new-password" required><button class="password-toggle" type="button" aria-controls="data-password" aria-label="Показать пароль">Показать</button></div><p class="field-hint">Сохраните пароль: без него восстановить файл нельзя.</p></div>
             <div class="form-actions"><button class="primary-button" type="submit">Зашифровать и создать PNG <span aria-hidden="true">↗</span></button><p class="form-status" role="status" aria-live="polite"></p></div>
@@ -87,11 +101,20 @@
 
       <aside class="notes" aria-label="Полезно знать"><div><span class="note-number">01</span><h2>Всё остаётся у вас</h2><p>Шифрование и работа с картинкой выполняются в этом браузере. Файлы никуда не отправляются.</p></div><div><span class="note-number">02</span><h2>Берегите оригинал</h2><p>Для извлечения нужен скачанный PNG без обработки редактором или преобразования в JPEG.</p></div><div><span class="note-number">03</span><h2>Не теряйте пароль</h2><p>Приложение его не хранит. Если пароль забыт, восстановить содержимое невозможно.</p></div></aside>
     </main>
-    <footer class="site-footer"><span>Файл в картинке</span><span>Локальное приложение · файлы остаются у вас</span></footer>
+    <footer class="site-footer">
+      <div class="footer-primary"><span class="footer-brand">Файл в картинке</span><span class="footer-description">Локальное приложение · файлы остаются у вас</span></div>
+      <div class="build-info" aria-label="Версия приложения">
+        <time datetime="__BUILD_DATE_ISO__" title="Дата создания HTML">__BUILD_DATE_TEXT__</time>
+        <span aria-hidden="true">·</span>
+        <code title="__BUILD_COMMIT_TITLE__">__BUILD_COMMIT__</code>
+      </div>
+      <div class="footer-contact-row"><a class="footer-contact" href="https://t.me/azazaaat" target="_blank" rel="noopener noreferrer" aria-label="Telegram: @azazaaat">@azazaaat</a></div>
+    </footer>
   </div>
   <script src="file-parts.js"></script>
   <script src="vault-core.js"></script>
   <script src="image-codec.js"></script>
+  <script src="directory-zip.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
