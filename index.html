@@ -12,8 +12,31 @@
 .split-settings{display:grid;grid-template-columns:1fr 1fr;gap:22px}.split-settings [hidden]{display:none!important}.split-settings select,.split-settings input{width:100%;min-width:0;height:48px;padding:10px 13px;border:1px solid #cddbd0;border-radius:9px;color:#1d3225;background:#fff;font:inherit;font-size:14px}.part-size-inputs{display:grid;grid-template-columns:1fr 90px;gap:10px}.split-summary{margin:14px 0 24px;padding:13px 16px;border:1px solid #dcebdd;border-radius:9px;background:#f5faf4;color:#426c4e;font-size:13px;line-height:1.6}.split-summary.is-error{color:#a14835;background:#fff4f0;border-color:#f1d5ca}.result-multiple{display:block}.result-multiple[hidden]{display:none}.result-heading{display:flex;gap:15px;align-items:center}.result-list{list-style:none;padding:0;margin:16px 0 0;display:grid;gap:10px;max-height:420px;overflow:auto}.result-list li{display:flex;align-items:center;gap:12px;border-top:1px solid #d4e6d7;padding-top:12px}.result-file{min-width:0;flex:1}.result-file strong{display:block;overflow-wrap:anywhere;font-size:13px}.result-list .download-link{flex:none}.split-settings :disabled{opacity:.6}select:focus-visible{outline:3px solid #87cda1;outline-offset:3px}@media(max-width:580px){.split-settings{grid-template-columns:1fr;gap:0}.result-list li{align-items:flex-start;flex-direction:column}.result-list .download-link{margin:0}}
 
 
-.source-kind{max-width:320px}.source-kind select{width:100%;height:48px;padding:10px 13px;border:1px solid #cddbd0;border-radius:9px;color:#1d3225;background:#fff;font:inherit;font-size:14px}.field[hidden]{display:none!important}
-.split-settings select,.source-kind select{appearance:none;padding-right:42px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='m1 1 5 5 5-5' fill='none' stroke='%23426c4e' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;background-size:12px 8px}
+.field[hidden]{display:none!important}
+.split-settings select{appearance:none;padding-right:42px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='m1 1 5 5 5-5' fill='none' stroke='%23426c4e' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;background-size:12px 8px}
+
+.choice-group{border:0;padding:0;min-inline-size:0;margin:0 0 24px}
+.choice-group legend{padding:0;margin-bottom:10px;font-size:13px;font-weight:750}
+.choice-options{display:grid;gap:12px}
+.choice-group .choice-option{position:relative;display:block;min-width:0;margin:0;cursor:pointer}
+.choice-option input{position:absolute;width:1px;height:1px;padding:0;margin:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.choice-face{display:flex;align-items:center;justify-content:center;min-height:44px;padding:11px 15px;border:1px solid #dce7dc;border-radius:9px;background:#fff;color:#4a6954;transition:background .15s,border-color .15s;box-sizing:border-box}
+.choice-option:hover .choice-face{border-color:#98b99d;background:#f7faf6}
+.choice-option input:checked+.choice-face{border-color:#367456;background:#eef5ed;color:#285d43;box-shadow:inset 0 0 0 1px #367456}
+.choice-option input:focus-visible+.choice-face{outline:3px solid #87cda1;outline-offset:3px}
+.choice-option input:disabled+.choice-face{opacity:.5;cursor:not-allowed}
+.source-kind{max-width:320px}
+.source-options{grid-template-columns:1fr 1fr;gap:4px;padding:4px;border:1px solid #dce7dc;border-radius:12px;background:#f5f8f3}
+.source-options .choice-face{border-color:transparent;background:transparent;font-size:13px;font-weight:750}
+.source-options .choice-option input:checked+.choice-face{box-shadow:0 2px 5px #23442d0b}
+.packing-options{grid-template-columns:repeat(3,minmax(0,1fr))}
+.packing-options .choice-face{display:grid;align-content:start;justify-content:stretch;gap:8px;min-height:104px;height:100%;padding:17px 16px;border-radius:12px}
+.packing-options strong{display:flex;align-items:center;gap:9px;font-size:13px;line-height:1.4}
+.packing-options strong::before{content:"";display:block;flex:none;width:14px;height:14px;box-sizing:border-box;border:1.5px solid #b1c5b4;border-radius:50%}
+.packing-options input:checked+.choice-face strong::before{border-color:#367456;background:#367456;box-shadow:inset 0 0 0 3px #eef5ed}
+.choice-description{padding-left:23px;font-size:12px;font-weight:400;line-height:1.5;color:#74847b}
+.split-settings{display:block;max-width:510px}
+@media(max-width:680px){.packing-options{grid-template-columns:1fr;gap:8px}.packing-options .choice-face{min-height:0;padding:13px 15px;gap:4px}}
 
 </style>
 </head>
@@ -59,7 +82,10 @@
         <div class="form-card">
           <form id="panel-hide" role="tabpanel" aria-labelledby="tab-hide" hidden novalidate>
             <div class="form-heading"><span class="form-number">01</span><div><h3>Скрыть файл в изображении</h3><p>Внешний вид картинки почти не изменится. Нужен достаточно большой носитель.</p></div></div>
-            <div class="field source-kind"><label for="hide-source-kind">Что зашифровать</label><select id="hide-source-kind"><option value="file">Файл</option><option value="folder" id="hide-folder-option">Папка → ZIP</option></select></div>
+            <fieldset class="field choice-group source-kind" id="hide-source-kind"><legend>Что зашифровать</legend><div class="choice-options source-options">
+              <label class="choice-option"><input id="hide-source-file" type="radio" name="hide-source-kind" value="file" checked><span class="choice-face">Файл</span></label>
+              <label class="choice-option"><input id="hide-folder-option" type="radio" name="hide-source-kind" value="folder" aria-describedby="hide-source-hint"><span class="choice-face">Папка → ZIP</span></label>
+            </div><p class="field-hint" id="hide-source-hint" hidden>Выбор папки не поддерживается этим браузером.</p></fieldset>
             <div class="field-grid">
               <div class="field" id="hide-file-field"><label for="hide-file">Файл для шифрования <span class="required">*</span></label><input id="hide-file" name="file" type="file" required aria-describedby="hide-file-hint hide-file-info"><p class="field-hint" id="hide-file-hint">До 10 MB. Подойдёт и пустой файл.</p><p class="file-info" id="hide-file-info"></p></div>
               <div class="field" id="hide-folder-field" hidden><label for="hide-folder">Папка для шифрования <span class="required">*</span></label><input id="hide-folder" name="folder" type="file" webkitdirectory multiple disabled aria-describedby="hide-folder-hint hide-folder-info"><p class="field-hint" id="hide-folder-hint">Папка будет упакована в ZIP без сжатия. До 10 MB вместе со служебными данными ZIP. Пустые папки не сохраняются. После извлечения скачивается ZIP.</p><p class="file-info" id="hide-folder-info"></p></div>
@@ -73,11 +99,18 @@
 
           <form id="panel-data" role="tabpanel" aria-labelledby="tab-data" novalidate>
             <div class="form-heading"><span class="form-number">02</span><div><h3>Создать картинку с данными</h3><p>Создайте один PNG или разделите файл на несколько картинок.</p></div></div>
-            <div class="field source-kind"><label for="data-source-kind">Что зашифровать</label><select id="data-source-kind"><option value="file">Файл</option><option value="folder" id="data-folder-option">Папка → ZIP</option></select></div>
+            <fieldset class="field choice-group source-kind" id="data-source-kind"><legend>Что зашифровать</legend><div class="choice-options source-options">
+              <label class="choice-option"><input id="data-source-file" type="radio" name="data-source-kind" value="file" checked><span class="choice-face">Файл</span></label>
+              <label class="choice-option"><input id="data-folder-option" type="radio" name="data-source-kind" value="folder" aria-describedby="data-source-hint"><span class="choice-face">Папка → ZIP</span></label>
+            </div><p class="field-hint" id="data-source-hint" hidden>Выбор папки не поддерживается этим браузером.</p></fieldset>
             <div class="field" id="data-file-field"><label for="data-file">Файл для шифрования <span class="required">*</span></label><input id="data-file" name="file" type="file" required aria-describedby="data-file-hint data-file-info"><p class="field-hint" id="data-file-hint">До 512 MB на файл. До 64 MB исходных данных в одном PNG.</p><p class="file-info" id="data-file-info"></p></div>
             <div class="field" id="data-folder-field" hidden><label for="data-folder">Папка для шифрования <span class="required">*</span></label><input id="data-folder" name="folder" type="file" webkitdirectory multiple disabled aria-describedby="data-folder-hint data-folder-info"><p class="field-hint" id="data-folder-hint">Папка будет упакована в ZIP без сжатия. До 512 MB вместе со служебными данными ZIP; до 64 MB в одном PNG. Пустые папки не сохраняются. После извлечения скачивается ZIP.</p><p class="file-info" id="data-folder-info"></p></div>
+            <fieldset class="field choice-group packing-kind" id="data-split-mode" aria-describedby="data-split-hint"><legend>Способ упаковки</legend><div class="choice-options packing-options">
+              <label class="choice-option"><input id="data-pack-single" type="radio" name="data-split-mode" value="single" checked><span class="choice-face"><strong>Один PNG</strong><span class="choice-description">Весь файл в одной картинке</span></span></label>
+              <label class="choice-option"><input id="data-pack-count" type="radio" name="data-split-mode" value="count"><span class="choice-face"><strong>По количеству частей</strong><span class="choice-description">Задайте, сколько PNG создать</span></span></label>
+              <label class="choice-option"><input id="data-pack-size" type="radio" name="data-split-mode" value="size"><span class="choice-face"><strong>По размеру части</strong><span class="choice-description">Задайте объём данных в PNG</span></span></label>
+            </div></fieldset>
             <div class="split-settings">
-              <div class="field"><label for="data-split-mode">Способ упаковки</label><select id="data-split-mode" aria-describedby="data-split-hint"><option value="single">Один PNG</option><option value="count">По количеству частей</option><option value="size">По размеру части</option></select></div>
               <div class="field" id="data-count-field" hidden><label for="data-part-count">Количество частей</label><input id="data-part-count" type="number" min="1" max="1000" step="1" value="4" disabled aria-describedby="data-split-summary"></div>
               <div class="field" id="data-size-field" hidden><label for="data-part-size">Размер исходных данных в части</label><div class="part-size-inputs"><input id="data-part-size" type="text" inputmode="decimal" value="10" disabled aria-describedby="data-split-hint data-split-summary"><select id="data-part-unit" aria-label="Единица размера части" disabled><option value="KiB">kB</option><option value="MiB" selected>MB</option></select></div></div>
             </div>
@@ -688,8 +721,12 @@
     } catch (error) { clearResult(form); throw error; }
   }
 
+  function choiceValue(id) {
+    return Array.from(document.getElementById(id).querySelectorAll('input[type=radio]')).find(input => input.checked).value;
+  }
+
   function syncSplitFields() {
-    const mode = document.getElementById('data-split-mode').value;
+    const mode = choiceValue('data-split-mode');
     document.getElementById('data-count-field').hidden = mode !== 'count';
     document.getElementById('data-size-field').hidden = mode !== 'size';
     document.getElementById('data-part-count').disabled = busy || mode !== 'count';
@@ -698,7 +735,7 @@
   }
 
   function readSplitOptions() {
-    const mode = document.getElementById('data-split-mode').value;
+    const mode = choiceValue('data-split-mode');
     if (mode === 'size') return { mode, partSize: FileParts.parsePartSize(document.getElementById('data-part-size').value, document.getElementById('data-part-unit').value) };
     if (mode === 'count') {
       const value = document.getElementById('data-part-count').value.trim();
@@ -768,12 +805,13 @@
   }
 
   function folderSelected(mode) {
-    return document.getElementById(`${mode}-source-kind`).value === 'folder';
+    return choiceValue(`${mode}-source-kind`) === 'folder';
   }
 
   function syncSourceFields() {
     for (const mode of ['hide', 'data']) {
       const folder = folderSelected(mode);
+      document.getElementById(`${mode}-folder-option`).disabled = busy || !('webkitdirectory' in document.getElementById(`${mode}-folder`));
       for (const kind of ['file', 'folder']) {
         const active = folder === (kind === 'folder');
         document.getElementById(`${mode}-${kind}-field`).hidden = !active;
@@ -1083,7 +1121,13 @@
       setStatus(input.closest('form'), '');
     });
   });
-  ['data-split-mode','data-part-count','data-part-size','data-part-unit'].forEach(id => {
+  document.getElementById('data-split-mode').querySelectorAll('input[type=radio]').forEach(input => {
+    input.addEventListener('change', () => {
+      if (busy || !input.checked) return;
+      clearResult(forms.data); setStatus(forms.data, ''); updateSplitPreview();
+    });
+  });
+  ['data-part-count','data-part-size','data-part-unit'].forEach(id => {
     const input = document.getElementById(id);
     const event = input.tagName === 'SELECT' ? 'change' : 'input';
     input.addEventListener(event, () => { clearResult(forms.data); setStatus(forms.data, ''); updateSplitPreview(); });
@@ -1093,9 +1137,10 @@
     const folderOption = document.getElementById(`${mode}-folder-option`);
     if (!('webkitdirectory' in folderInput)) {
       folderOption.disabled = true;
-      folderOption.textContent = 'Папка — не поддерживается браузером';
+      document.getElementById(`${mode}-source-hint`).hidden = false;
     }
-    document.getElementById(`${mode}-source-kind`).addEventListener('change', () => {
+    document.getElementById(`${mode}-source-kind`).querySelectorAll('input[type=radio]').forEach(input => input.addEventListener('change', () => {
+      if (busy || !input.checked) return;
       clearResult(forms[mode]);
       setStatus(forms[mode], '');
       for (const kind of ['file', 'folder']) {
@@ -1105,7 +1150,7 @@
       syncSourceFields();
       if (mode === 'data') updateSplitPreview();
       else updateCoverCapacity();
-    });
+    }));
   }
   syncSourceFields();
   updateSplitPreview();

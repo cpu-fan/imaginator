@@ -11,7 +11,7 @@ test('source sizes and split previews use Latin kB and MB labels',async()=>{
  assert.match(h.nodes.get('data-split-summary').textContent,/2 MB/);
 });
 test('preview supports count size decimal units and invalid parameters',async()=>{
- const h=createAppHarness();assert.equal(h.nodes.get('data-split-mode').value,'single');assert.equal(h.nodes.get('data-count-field').hidden,true);assert.equal(h.nodes.get('data-size-field').hidden,true);
+ const h=createAppHarness();assert.equal(h.nodes.get('data-pack-single').checked,true);assert.equal(h.nodes.get('data-count-field').hidden,true);assert.equal(h.nodes.get('data-size-field').hidden,true);
  await h.setFiles('data-file',[{name:'large.bin',size:37*1048576}]);await h.setValue('data-split-mode','count','change');assert.match(h.nodes.get('data-split-summary').textContent,/4/);assert.match(h.nodes.get('data-split-summary').textContent,/9,25/);
  await h.setValue('data-split-mode','size','change');await h.setValue('data-part-size','20');assert.match(h.nodes.get('data-split-summary').textContent,/17/);assert.match(h.nodes.get('data-split-summary').textContent,/20/);
  await h.setFiles('data-file',[{name:'small.bin',size:2048}]);await h.setValue('data-part-size','0,5');await h.setValue('data-part-unit','KiB','change');assert.match(h.nodes.get('data-split-summary').textContent,/4/);

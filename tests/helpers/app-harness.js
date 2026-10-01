@@ -1,7 +1,7 @@
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const {webcrypto}=require('node:crypto');
 class Element {
- constructor(tag,attrs={}){this.tagName=tag.toUpperCase();this.attrs=attrs;this.children=[];this.parentElement=null;this.listeners={};this.value=attrs.value||'';this.files=[];this.disabled='disabled'in attrs;this.hidden='hidden'in attrs;this._text='';this.classes=new Set((attrs.class||'').split(/ +/).filter(Boolean));this.classList={toggle:(name,value)=>value?this.classes.add(name):this.classes.delete(name),contains:name=>this.classes.has(name),add:name=>this.classes.add(name),remove:name=>this.classes.delete(name)};}
+ constructor(tag,attrs={}){this.tagName=tag.toUpperCase();this.attrs=attrs;this.children=[];this.parentElement=null;this.listeners={};this.value=attrs.value||'';this.files=[];this.checked='checked'in attrs;this.disabled='disabled'in attrs;this.hidden='hidden'in attrs;this._text='';this.classes=new Set((attrs.class||'').split(/ +/).filter(Boolean));this.classList={toggle:(name,value)=>value?this.classes.add(name):this.classes.delete(name),contains:name=>this.classes.has(name),add:name=>this.classes.add(name),remove:name=>this.classes.delete(name)};}
  get className(){return [...this.classes].join(' ');}set className(value){this.classes=new Set(String(value).split(/ +/).filter(Boolean));}
  get id(){return this.attrs.id||'';}get type(){return this.attrs.type||'';}set type(value){this.attrs.type=value;}
  get value(){return this._value||'';}set value(value){this._value=String(value);if(this.type==='file'&&value==='')this.files=[];}
@@ -47,7 +47,7 @@ function createAppHarness(overrides={}){
  return {nodes,context,faults,activeUrls,revokedUrls,
   downloads(){return root.querySelectorAll('.download-link').filter(a=>a.clickCount).map(a=>({name:a.download,blob:activeUrls.get(a.href)}));},
   async setFiles(id,files){nodes.get(id).files=files;await dispatch(id,'change');},
-  async setValue(id,value,type='input'){const node=nodes.get(id);if(!node)throw new Error('Missing UI control: '+id);node.value=String(value);await dispatch(id,type);},dispatch,
+  async setValue(id,value,type='input'){const node=nodes.get(id);if(!node)throw new Error('Missing UI control: '+id);if(node.tagName==='FIELDSET'){const radios=node.querySelectorAll('input[type=radio]'),radio=radios.find(input=>input.value===String(value));if(!radio)throw new Error('Missing radio choice: '+value);if(radio.disabled||radio.checked)return;radios.forEach(input=>input.checked=input===radio);await radio.fire('change');return;}node.value=String(value);await dispatch(id,type);},dispatch,
   submit:mode=>dispatch('panel-'+mode,'submit'),
   entries(mode){const form=nodes.get('panel-'+mode);return form.querySelectorAll('.download-link').filter(a=>a.href).map(a=>({name:a.download,blob:activeUrls.get(a.href)}));},
   status:mode=>nodes.get('panel-'+mode).querySelector('.form-status').textContent,

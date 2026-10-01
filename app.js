@@ -64,8 +64,12 @@
     } catch (error) { clearResult(form); throw error; }
   }
 
+  function choiceValue(id) {
+    return Array.from(document.getElementById(id).querySelectorAll('input[type=radio]')).find(input => input.checked).value;
+  }
+
   function syncSplitFields() {
-    const mode = document.getElementById('data-split-mode').value;
+    const mode = choiceValue('data-split-mode');
     document.getElementById('data-count-field').hidden = mode !== 'count';
     document.getElementById('data-size-field').hidden = mode !== 'size';
     document.getElementById('data-part-count').disabled = busy || mode !== 'count';
@@ -74,7 +78,7 @@
   }
 
   function readSplitOptions() {
-    const mode = document.getElementById('data-split-mode').value;
+    const mode = choiceValue('data-split-mode');
     if (mode === 'size') return { mode, partSize: FileParts.parsePartSize(document.getElementById('data-part-size').value, document.getElementById('data-part-unit').value) };
     if (mode === 'count') {
       const value = document.getElementById('data-part-count').value.trim();
@@ -144,12 +148,13 @@
   }
 
   function folderSelected(mode) {
-    return document.getElementById(`${mode}-source-kind`).value === 'folder';
+    return choiceValue(`${mode}-source-kind`) === 'folder';
   }
 
   function syncSourceFields() {
     for (const mode of ['hide', 'data']) {
       const folder = folderSelected(mode);
+      document.getElementById(`${mode}-folder-option`).disabled = busy || !('webkitdirectory' in document.getElementById(`${mode}-folder`));
       for (const kind of ['file', 'folder']) {
         const active = folder === (kind === 'folder');
         document.getElementById(`${mode}-${kind}-field`).hidden = !active;
@@ -459,7 +464,13 @@
       setStatus(input.closest('form'), '');
     });
   });
-  ['data-split-mode','data-part-count','data-part-size','data-part-unit'].forEach(id => {
+  document.getElementById('data-split-mode').querySelectorAll('input[type=radio]').forEach(input => {
+    input.addEventListener('change', () => {
+      if (busy || !input.checked) return;
+      clearResult(forms.data); setStatus(forms.data, ''); updateSplitPreview();
+    });
+  });
+  ['data-part-count','data-part-size','data-part-unit'].forEach(id => {
     const input = document.getElementById(id);
     const event = input.tagName === 'SELECT' ? 'change' : 'input';
     input.addEventListener(event, () => { clearResult(forms.data); setStatus(forms.data, ''); updateSplitPreview(); });
@@ -469,9 +480,10 @@
     const folderOption = document.getElementById(`${mode}-folder-option`);
     if (!('webkitdirectory' in folderInput)) {
       folderOption.disabled = true;
-      folderOption.textContent = 'Папка — не поддерживается браузером';
+      document.getElementById(`${mode}-source-hint`).hidden = false;
     }
-    document.getElementById(`${mode}-source-kind`).addEventListener('change', () => {
+    document.getElementById(`${mode}-source-kind`).querySelectorAll('input[type=radio]').forEach(input => input.addEventListener('change', () => {
+      if (busy || !input.checked) return;
       clearResult(forms[mode]);
       setStatus(forms[mode], '');
       for (const kind of ['file', 'folder']) {
@@ -481,7 +493,7 @@
       syncSourceFields();
       if (mode === 'data') updateSplitPreview();
       else updateCoverCapacity();
-    });
+    }));
   }
   syncSourceFields();
   updateSplitPreview();
