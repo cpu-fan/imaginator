@@ -13,7 +13,7 @@
   function formatSize(bytes) {
     if (bytes < 1024) return `${bytes} Б`;
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toLocaleString('ru-RU', { maximumFractionDigits: 1 })} КиБ`;
-    return `${(bytes / (1024 * 1024)).toLocaleString('ru-RU', { maximumFractionDigits: 2 })} МиБ`;
+    return `${(bytes / (1024 * 1024)).toLocaleString('ru-RU', { maximumFractionDigits: 2 })} МБ`;
   }
 
   function setStatus(form, message, isError = false) {
@@ -315,7 +315,8 @@
         const files = Array.from(document.getElementById('extract-image').files), password = passwordFor(mode);
         const restored = await restorePngFiles(files, password);
         showResult(form, restored.blob, restored.name, `${restored.name} · ${formatSize(restored.blob.size)}`);
-        setStatus(form, 'Файл успешно восстановлен. Скачайте его ниже.');
+        form.querySelector('.download-link').click();
+        setStatus(form, 'Файл успешно восстановлен. Скачивание начато. Если браузер его заблокировал, используйте ссылку ниже.');
         return;
       }
 
@@ -323,7 +324,8 @@
         const file = selectedFile('data-file', 'файл'), password = passwordFor(mode);
         const entries = await createDataPngs(file, password, readSplitOptions());
         showResults(form, entries);
-        setStatus(form, `Готово PNG: ${entries.length}. Скачайте все части ниже.`);
+        form.querySelectorAll('.download-link').forEach(link => link.click());
+        setStatus(form, `Готово PNG: ${entries.length}. Скачивание начато. Если браузер его заблокировал, используйте ссылки ниже.`);
         return;
       }
 

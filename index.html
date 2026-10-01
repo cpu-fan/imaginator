@@ -11,6 +11,8 @@
 
 .split-settings{display:grid;grid-template-columns:1fr 1fr;gap:22px}.split-settings [hidden]{display:none!important}.split-settings select,.split-settings input{width:100%;min-width:0;height:48px;padding:10px 13px;border:1px solid #cddbd0;border-radius:9px;color:#1d3225;background:#fff;font:inherit;font-size:14px}.part-size-inputs{display:grid;grid-template-columns:1fr 90px;gap:10px}.split-summary{margin:14px 0 24px;padding:13px 16px;border:1px solid #dcebdd;border-radius:9px;background:#f5faf4;color:#426c4e;font-size:13px;line-height:1.6}.split-summary.is-error{color:#a14835;background:#fff4f0;border-color:#f1d5ca}.result-multiple{display:block}.result-multiple[hidden]{display:none}.result-heading{display:flex;gap:15px;align-items:center}.result-list{list-style:none;padding:0;margin:16px 0 0;display:grid;gap:10px;max-height:420px;overflow:auto}.result-list li{display:flex;align-items:center;gap:12px;border-top:1px solid #d4e6d7;padding-top:12px}.result-file{min-width:0;flex:1}.result-file strong{display:block;overflow-wrap:anywhere;font-size:13px}.result-list .download-link{flex:none}.split-settings :disabled{opacity:.6}select:focus-visible{outline:3px solid #87cda1;outline-offset:3px}@media(max-width:580px){.split-settings{grid-template-columns:1fr;gap:0}.result-list li{align-items:flex-start;flex-direction:column}.result-list .download-link{margin:0}}
 
+.split-settings select{appearance:none;padding-right:42px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='m1 1 5 5 5-5' fill='none' stroke='%23426c4e' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;background-size:12px 8px}
+
 </style>
 </head>
 <body>
@@ -47,13 +49,13 @@
         </div>
 
         <div class="mode-tabs" role="tablist" aria-label="Режим работы">
-          <button class="mode-tab" id="tab-hide" type="button" role="tab" aria-controls="panel-hide" aria-selected="true" tabindex="0" data-mode="hide"><span class="tab-icon" aria-hidden="true">◈</span><span class="tab-copy"><strong>Скрыть в картинке</strong><small>Сохранить вид выбранного изображения</small></span><span class="tab-arrow" aria-hidden="true">↗</span></button>
-          <button class="mode-tab" id="tab-data" type="button" role="tab" aria-controls="panel-data" aria-selected="false" tabindex="-1" data-mode="data"><span class="tab-icon" aria-hidden="true">▦</span><span class="tab-copy"><strong>Создать PNG с данными</strong><small>Картинка будет создана автоматически</small></span><span class="tab-arrow" aria-hidden="true">↗</span></button>
+          <button class="mode-tab" id="tab-hide" type="button" role="tab" aria-controls="panel-hide" aria-selected="false" tabindex="-1" data-mode="hide"><span class="tab-icon" aria-hidden="true">◈</span><span class="tab-copy"><strong>Скрыть в картинке</strong><small>Сохранить вид выбранного изображения</small></span><span class="tab-arrow" aria-hidden="true">↗</span></button>
+          <button class="mode-tab" id="tab-data" type="button" role="tab" aria-controls="panel-data" aria-selected="true" tabindex="0" data-mode="data"><span class="tab-icon" aria-hidden="true">▦</span><span class="tab-copy"><strong>Создать PNG с данными</strong><small>Картинка будет создана автоматически</small></span><span class="tab-arrow" aria-hidden="true">↗</span></button>
           <button class="mode-tab" id="tab-extract" type="button" role="tab" aria-controls="panel-extract" aria-selected="false" tabindex="-1" data-mode="extract"><span class="tab-icon" aria-hidden="true">↙</span><span class="tab-copy"><strong>Извлечь файл</strong><small>Открыть PNG и вернуть исходный файл</small></span><span class="tab-arrow" aria-hidden="true">↗</span></button>
         </div>
 
         <div class="form-card">
-          <form id="panel-hide" role="tabpanel" aria-labelledby="tab-hide" novalidate>
+          <form id="panel-hide" role="tabpanel" aria-labelledby="tab-hide" hidden novalidate>
             <div class="form-heading"><span class="form-number">01</span><div><h3>Скрыть файл в изображении</h3><p>Внешний вид картинки почти не изменится. Нужен достаточно большой носитель.</p></div></div>
             <div class="field-grid">
               <div class="field"><label for="hide-file">Файл для шифрования <span class="required">*</span></label><input id="hide-file" name="file" type="file" required aria-describedby="hide-file-hint hide-file-info"><p class="field-hint" id="hide-file-hint">До 10 МБ. Подойдёт и пустой файл.</p><p class="file-info" id="hide-file-info"></p></div>
@@ -65,15 +67,15 @@
             <div class="result" hidden><span class="result-icon" aria-hidden="true">✓</span><div><strong>PNG готов</strong><p>Скачайте картинку и храните её без редактирования.</p></div><a class="download-link" href="#" download>Скачать PNG <span aria-hidden="true">↓</span></a></div>
           </form>
 
-          <form id="panel-data" role="tabpanel" aria-labelledby="tab-data" hidden novalidate>
+          <form id="panel-data" role="tabpanel" aria-labelledby="tab-data" novalidate>
             <div class="form-heading"><span class="form-number">02</span><div><h3>Создать картинку с данными</h3><p>Создайте один PNG или разделите файл на несколько картинок.</p></div></div>
-            <div class="field"><label for="data-file">Файл для шифрования <span class="required">*</span></label><input id="data-file" name="file" type="file" required aria-describedby="data-file-hint data-file-info"><p class="field-hint" id="data-file-hint">До 512 МиБ на файл. До 64 МиБ исходных данных в одном PNG.</p><p class="file-info" id="data-file-info"></p></div>
+            <div class="field"><label for="data-file">Файл для шифрования <span class="required">*</span></label><input id="data-file" name="file" type="file" required aria-describedby="data-file-hint data-file-info"><p class="field-hint" id="data-file-hint">До 512 МБ на файл. До 64 МБ исходных данных в одном PNG.</p><p class="file-info" id="data-file-info"></p></div>
             <div class="split-settings">
               <div class="field"><label for="data-split-mode">Способ упаковки</label><select id="data-split-mode" aria-describedby="data-split-hint"><option value="single">Один PNG</option><option value="count">По количеству частей</option><option value="size">По размеру части</option></select></div>
               <div class="field" id="data-count-field" hidden><label for="data-part-count">Количество частей</label><input id="data-part-count" type="number" min="1" max="1000" step="1" value="4" disabled aria-describedby="data-split-summary"></div>
-              <div class="field" id="data-size-field" hidden><label for="data-part-size">Размер исходных данных в части</label><div class="part-size-inputs"><input id="data-part-size" type="text" inputmode="decimal" value="10" disabled aria-describedby="data-split-hint data-split-summary"><select id="data-part-unit" aria-label="Единица размера части" disabled><option value="KiB">КиБ</option><option value="MiB" selected>МиБ</option></select></div></div>
+              <div class="field" id="data-size-field" hidden><label for="data-part-size">Размер исходных данных в части</label><div class="part-size-inputs"><input id="data-part-size" type="text" inputmode="decimal" value="10" disabled aria-describedby="data-split-hint data-split-summary"><select id="data-part-unit" aria-label="Единица размера части" disabled><option value="KiB">КиБ</option><option value="MiB" selected>МБ</option></select></div></div>
             </div>
-            <p class="field-hint" id="data-split-hint">Размер относится к исходным данным: готовые PNG будут больше. 1 КиБ = 1024 байта, 1 МиБ = 1024 × 1024 байт. Максимум 1000 частей.</p>
+            <p class="field-hint" id="data-split-hint">Размер относится к исходным данным: готовые PNG будут больше. 1 КиБ = 1024 байта, 1 МБ = 1024 × 1024 байт. Максимум 1000 частей.</p>
             <p class="split-summary" id="data-split-summary" role="status" aria-live="polite">Выберите файл, чтобы увидеть расчёт частей.</p>
             <div class="field password-field"><label for="data-password">Пароль <span class="required">*</span></label><div class="password-wrap"><input id="data-password" name="password" type="password" autocomplete="new-password" required><button class="password-toggle" type="button" aria-controls="data-password" aria-label="Показать пароль">Показать</button></div><p class="field-hint">Сохраните пароль: без него восстановить файл нельзя.</p></div>
             <div class="form-actions"><button class="primary-button" type="submit">Зашифровать и создать PNG <span aria-hidden="true">↗</span></button><p class="form-status" role="status" aria-live="polite"></p></div>
@@ -111,25 +113,25 @@
   }
   function parsePartSize(value, unit) {
     if (typeof value !== 'string' || !/^(?:[0-9]+(?:[.,][0-9]+)?|[.,][0-9]+)$/.test(value.trim()) || !['KiB','MiB'].includes(unit)) {
-      fail('INVALID_SPLIT', 'Введите положительный размер части в КиБ или МиБ.');
+      fail('INVALID_SPLIT', 'Введите положительный размер части в КиБ или МБ.');
     }
     const size = Math.floor(Number(value.trim().replace(',', '.')) * (unit === 'KiB' ? 1024 : 1048576));
-    if (!integer(size, 1, MAX_PART_SIZE)) fail('INVALID_SPLIT', 'Размер части должен быть от 1 байта до 64 МиБ.');
+    if (!integer(size, 1, MAX_PART_SIZE)) fail('INVALID_SPLIT', 'Размер части должен быть от 1 байта до 64 МБ.');
     return size;
   }
   function planParts(totalSize, options) {
-    if (!integer(totalSize, 0, MAX_SOURCE_SIZE)) fail('INVALID_SPLIT', 'Размер исходного файла не должен превышать 512 МиБ.');
+    if (!integer(totalSize, 0, MAX_SOURCE_SIZE)) fail('INVALID_SPLIT', 'Размер исходного файла не должен превышать 512 МБ.');
     if (!options || !['single','count','size'].includes(options.mode)) fail('INVALID_SPLIT', 'Выберите способ разбивки.');
     let count;
     if (options.mode === 'size') {
-      if (!integer(options.partSize, 1, MAX_PART_SIZE)) fail('INVALID_SPLIT', 'Размер части должен быть от 1 байта до 64 МиБ.');
+      if (!integer(options.partSize, 1, MAX_PART_SIZE)) fail('INVALID_SPLIT', 'Размер части должен быть от 1 байта до 64 МБ.');
       count = Math.max(1, Math.ceil(totalSize / options.partSize));
     } else count = options.mode === 'single' ? 1 : options.count;
     if (!integer(count, 1, MAX_PART_COUNT)) fail('INVALID_SPLIT', 'Нужно от 1 до 1000 частей. Увеличьте размер части или уменьшите количество.');
     if ((totalSize === 0 && count !== 1) || (totalSize > 0 && count > totalSize)) fail('INVALID_SPLIT', 'Количество частей не может превышать число байтов файла. Для пустого файла нужна одна часть.');
     const q = Math.floor(totalSize / count), r = totalSize % count;
     const largest = options.mode === 'size' ? Math.min(totalSize, options.partSize) : q + (r ? 1 : 0);
-    if (largest > MAX_PART_SIZE) fail('INVALID_SPLIT', 'В одной части не должно быть больше 64 МиБ. Выберите разбивку или увеличьте количество частей.');
+    if (largest > MAX_PART_SIZE) fail('INVALID_SPLIT', 'В одной части не должно быть больше 64 МБ. Выберите разбивку или увеличьте количество частей.');
     return Array.from({length:count}, (_, index) => options.mode === 'size'
       ? {index,offset:index * options.partSize,length:Math.min(options.partSize, totalSize - index * options.partSize)}
       : {index,offset:index * q + Math.min(index,r),length:q + (index < r ? 1 : 0)});
@@ -524,7 +526,7 @@
   function formatSize(bytes) {
     if (bytes < 1024) return `${bytes} Б`;
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toLocaleString('ru-RU', { maximumFractionDigits: 1 })} КиБ`;
-    return `${(bytes / (1024 * 1024)).toLocaleString('ru-RU', { maximumFractionDigits: 2 })} МиБ`;
+    return `${(bytes / (1024 * 1024)).toLocaleString('ru-RU', { maximumFractionDigits: 2 })} МБ`;
   }
 
   function setStatus(form, message, isError = false) {
@@ -826,7 +828,8 @@
         const files = Array.from(document.getElementById('extract-image').files), password = passwordFor(mode);
         const restored = await restorePngFiles(files, password);
         showResult(form, restored.blob, restored.name, `${restored.name} · ${formatSize(restored.blob.size)}`);
-        setStatus(form, 'Файл успешно восстановлен. Скачайте его ниже.');
+        form.querySelector('.download-link').click();
+        setStatus(form, 'Файл успешно восстановлен. Скачивание начато. Если браузер его заблокировал, используйте ссылку ниже.');
         return;
       }
 
@@ -834,7 +837,8 @@
         const file = selectedFile('data-file', 'файл'), password = passwordFor(mode);
         const entries = await createDataPngs(file, password, readSplitOptions());
         showResults(form, entries);
-        setStatus(form, `Готово PNG: ${entries.length}. Скачайте все части ниже.`);
+        form.querySelectorAll('.download-link').forEach(link => link.click());
+        setStatus(form, `Готово PNG: ${entries.length}. Скачивание начато. Если браузер его заблокировал, используйте ссылки ниже.`);
         return;
       }
 

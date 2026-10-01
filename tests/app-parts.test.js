@@ -84,3 +84,20 @@ test('failed restored Blob is cleared and the next attempt succeeds',async()=>{
 for (const globals of [{crypto:null},{File:null}]) test('missing browser API disables all form controls '+Object.keys(globals)[0],()=>{
  const h=createAppHarness({globals});assert.equal(h.controlsDisabled(),true);assert.match(h.status('hide'),/не поддерживает/);
 });
+
+for (const [mode,names] of [['single',['sample-данные.png']],['count',['sample.part-001-of-003.png','sample.part-002-of-003.png','sample.part-003-of-003.png']]]) test('creation automatically downloads complete PNG output '+mode,async()=>{
+ const h=createAppHarness();await configured(h);await h.setValue('data-split-mode',mode,'change');await h.submit('data');
+ assert.deepEqual(h.downloads().map(e=>e.name),names);assert.equal(h.downloads().every(e=>e.blob.type==='image/png'),true);h.unload();
+});
+test('failed PNG set never starts automatic downloads',async()=>{
+ const h=createAppHarness({faults:{urlAt:2}});await configured(h);await h.submit('data');assert.equal(h.downloads().length,0);assert.equal(h.hasResult('data'),false);h.unload();
+});
+
+test('extraction automatically downloads the restored file',async()=>{
+ const h=createAppHarness();await extract(h,pngSet());
+ assert.deepEqual(h.downloads().map(e=>e.name),['original.bin']);
+ assert.deepEqual([...new Uint8Array(await h.downloads()[0].blob.arrayBuffer())],[0,255,42,7,8]);h.unload();
+});
+test('failed extraction does not start a download',async()=>{
+ const h=createAppHarness();await extract(h,pngSet(),'wrong');assert.equal(h.downloads().length,0);h.unload();
+});
