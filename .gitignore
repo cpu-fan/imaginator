@@ -1,0 +1,30 @@
+# macOS and editor temporary files
+.DS_Store
+._*
+*.swp
+*.swo
+*~
+
+# Local credentials and machine settings
+.env
+.env.*
+!.env.example
+/.aws/
+/.codex/
+/.idea/
+
+# Local agent scratch and extra worktrees
+/.superpowers/
+/.worktrees/
+/worktrees/
+
+# Development dependencies and generated diagnostics
+node_modules/
+coverage/
+*.log
+*.tmp
+/test-artifacts/
+/downloads/
+/tmp/
+
+# index.html is the distributable and must remain tracked.
