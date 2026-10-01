@@ -7,6 +7,7 @@ class Element {
  get textContent(){return this._text+this.children.map(c=>c.textContent).join('');}set textContent(value){this._text=String(value);this.children=[];}
  append(...nodes){for(const node of nodes){node.parentElement=this;this.children.push(node);}}appendChild(node){this.append(node);return node;}
  replaceChildren(...nodes){this.children=[];this._text='';this.append(...nodes);}removeAttribute(key){delete this.attrs[key];delete this[key];}setAttribute(key,value){this.attrs[key]=String(value);}getAttribute(key){return this.attrs[key]??null;}focus(){}
+ click(){this.clickCount=(this.clickCount||0)+1;}
  addEventListener(type,fn){(this.listeners[type]??=[]).push(fn);}
  async fire(type){for(const fn of this.listeners[type]||[])await fn({target:this,preventDefault(){},key:''});}
  matches(selector){if(selector.startsWith('.'))return this.classes.has(selector.slice(1));if(selector.startsWith('#'))return this.id===selector.slice(1);const m=selector.match(/^([a-z]+)(?:\[([a-z-]+)=([^\]]+)\])?$/);return !!m&&this.tagName.toLowerCase()===m[1]&&(!m[2]||this.getAttribute(m[2])===m[3].replace(/['"]/g,''));}
@@ -42,6 +43,7 @@ function createAppHarness(overrides={}){
  vm.runInContext(fs.readFileSync(path.join(__dirname,'../../app.js'),'utf8'),context);
  const dispatch=async(id,type)=>{const node=nodes.get(id);if(!node)throw new Error('Missing UI control: '+id);await node.fire(type);};
  return {nodes,context,faults,activeUrls,revokedUrls,
+  downloads(){return root.querySelectorAll('.download-link').filter(a=>a.clickCount).map(a=>({name:a.download,blob:activeUrls.get(a.href)}));},
   async setFiles(id,files){nodes.get(id).files=files;await dispatch(id,'change');},
   async setValue(id,value,type='input'){const node=nodes.get(id);if(!node)throw new Error('Missing UI control: '+id);node.value=String(value);await dispatch(id,type);},dispatch,
   submit:mode=>dispatch('panel-'+mode,'submit'),

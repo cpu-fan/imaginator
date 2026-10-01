@@ -42,13 +42,13 @@
         </div>
 
         <div class="mode-tabs" role="tablist" aria-label="Режим работы">
-          <button class="mode-tab" id="tab-hide" type="button" role="tab" aria-controls="panel-hide" aria-selected="true" tabindex="0" data-mode="hide"><span class="tab-icon" aria-hidden="true">◈</span><span class="tab-copy"><strong>Скрыть в картинке</strong><small>Сохранить вид выбранного изображения</small></span><span class="tab-arrow" aria-hidden="true">↗</span></button>
-          <button class="mode-tab" id="tab-data" type="button" role="tab" aria-controls="panel-data" aria-selected="false" tabindex="-1" data-mode="data"><span class="tab-icon" aria-hidden="true">▦</span><span class="tab-copy"><strong>Создать PNG с данными</strong><small>Картинка будет создана автоматически</small></span><span class="tab-arrow" aria-hidden="true">↗</span></button>
+          <button class="mode-tab" id="tab-hide" type="button" role="tab" aria-controls="panel-hide" aria-selected="false" tabindex="-1" data-mode="hide"><span class="tab-icon" aria-hidden="true">◈</span><span class="tab-copy"><strong>Скрыть в картинке</strong><small>Сохранить вид выбранного изображения</small></span><span class="tab-arrow" aria-hidden="true">↗</span></button>
+          <button class="mode-tab" id="tab-data" type="button" role="tab" aria-controls="panel-data" aria-selected="true" tabindex="0" data-mode="data"><span class="tab-icon" aria-hidden="true">▦</span><span class="tab-copy"><strong>Создать PNG с данными</strong><small>Картинка будет создана автоматически</small></span><span class="tab-arrow" aria-hidden="true">↗</span></button>
           <button class="mode-tab" id="tab-extract" type="button" role="tab" aria-controls="panel-extract" aria-selected="false" tabindex="-1" data-mode="extract"><span class="tab-icon" aria-hidden="true">↙</span><span class="tab-copy"><strong>Извлечь файл</strong><small>Открыть PNG и вернуть исходный файл</small></span><span class="tab-arrow" aria-hidden="true">↗</span></button>
         </div>
 
         <div class="form-card">
-          <form id="panel-hide" role="tabpanel" aria-labelledby="tab-hide" novalidate>
+          <form id="panel-hide" role="tabpanel" aria-labelledby="tab-hide" hidden novalidate>
             <div class="form-heading"><span class="form-number">01</span><div><h3>Скрыть файл в изображении</h3><p>Внешний вид картинки почти не изменится. Нужен достаточно большой носитель.</p></div></div>
             <div class="field-grid">
               <div class="field"><label for="hide-file">Файл для шифрования <span class="required">*</span></label><input id="hide-file" name="file" type="file" required aria-describedby="hide-file-hint hide-file-info"><p class="field-hint" id="hide-file-hint">До 10 МБ. Подойдёт и пустой файл.</p><p class="file-info" id="hide-file-info"></p></div>
@@ -60,15 +60,15 @@
             <div class="result" hidden><span class="result-icon" aria-hidden="true">✓</span><div><strong>PNG готов</strong><p>Скачайте картинку и храните её без редактирования.</p></div><a class="download-link" href="#" download>Скачать PNG <span aria-hidden="true">↓</span></a></div>
           </form>
 
-          <form id="panel-data" role="tabpanel" aria-labelledby="tab-data" hidden novalidate>
+          <form id="panel-data" role="tabpanel" aria-labelledby="tab-data" novalidate>
             <div class="form-heading"><span class="form-number">02</span><div><h3>Создать картинку с данными</h3><p>Создайте один PNG или разделите файл на несколько картинок.</p></div></div>
-            <div class="field"><label for="data-file">Файл для шифрования <span class="required">*</span></label><input id="data-file" name="file" type="file" required aria-describedby="data-file-hint data-file-info"><p class="field-hint" id="data-file-hint">До 512 МиБ на файл. До 64 МиБ исходных данных в одном PNG.</p><p class="file-info" id="data-file-info"></p></div>
+            <div class="field"><label for="data-file">Файл для шифрования <span class="required">*</span></label><input id="data-file" name="file" type="file" required aria-describedby="data-file-hint data-file-info"><p class="field-hint" id="data-file-hint">До 512 МБ на файл. До 64 МБ исходных данных в одном PNG.</p><p class="file-info" id="data-file-info"></p></div>
             <div class="split-settings">
               <div class="field"><label for="data-split-mode">Способ упаковки</label><select id="data-split-mode" aria-describedby="data-split-hint"><option value="single">Один PNG</option><option value="count">По количеству частей</option><option value="size">По размеру части</option></select></div>
               <div class="field" id="data-count-field" hidden><label for="data-part-count">Количество частей</label><input id="data-part-count" type="number" min="1" max="1000" step="1" value="4" disabled aria-describedby="data-split-summary"></div>
-              <div class="field" id="data-size-field" hidden><label for="data-part-size">Размер исходных данных в части</label><div class="part-size-inputs"><input id="data-part-size" type="text" inputmode="decimal" value="10" disabled aria-describedby="data-split-hint data-split-summary"><select id="data-part-unit" aria-label="Единица размера части" disabled><option value="KiB">КиБ</option><option value="MiB" selected>МиБ</option></select></div></div>
+              <div class="field" id="data-size-field" hidden><label for="data-part-size">Размер исходных данных в части</label><div class="part-size-inputs"><input id="data-part-size" type="text" inputmode="decimal" value="10" disabled aria-describedby="data-split-hint data-split-summary"><select id="data-part-unit" aria-label="Единица размера части" disabled><option value="KiB">КиБ</option><option value="MiB" selected>МБ</option></select></div></div>
             </div>
-            <p class="field-hint" id="data-split-hint">Размер относится к исходным данным: готовые PNG будут больше. 1 КиБ = 1024 байта, 1 МиБ = 1024 × 1024 байт. Максимум 1000 частей.</p>
+            <p class="field-hint" id="data-split-hint">Размер относится к исходным данным: готовые PNG будут больше. 1 КиБ = 1024 байта, 1 МБ = 1024 × 1024 байт. Максимум 1000 частей.</p>
             <p class="split-summary" id="data-split-summary" role="status" aria-live="polite">Выберите файл, чтобы увидеть расчёт частей.</p>
             <div class="field password-field"><label for="data-password">Пароль <span class="required">*</span></label><div class="password-wrap"><input id="data-password" name="password" type="password" autocomplete="new-password" required><button class="password-toggle" type="button" aria-controls="data-password" aria-label="Показать пароль">Показать</button></div><p class="field-hint">Сохраните пароль: без него восстановить файл нельзя.</p></div>
             <div class="form-actions"><button class="primary-button" type="submit">Зашифровать и создать PNG <span aria-hidden="true">↗</span></button><p class="form-status" role="status" aria-live="polite"></p></div>
