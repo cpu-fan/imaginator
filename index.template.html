@@ -101,7 +101,15 @@
 
       <aside class="notes" aria-label="Полезно знать"><div><span class="note-number">01</span><h2>Всё остаётся у вас</h2><p>Шифрование и работа с картинкой выполняются в этом браузере. Файлы никуда не отправляются.</p></div><div><span class="note-number">02</span><h2>Берегите оригинал</h2><p>Для извлечения нужен скачанный PNG без обработки редактором или преобразования в JPEG.</p></div><div><span class="note-number">03</span><h2>Не теряйте пароль</h2><p>Приложение его не хранит. Если пароль забыт, восстановить содержимое невозможно.</p></div></aside>
     </main>
-    <footer class="site-footer"><span>Файл в картинке</span><span>Локальное приложение · файлы остаются у вас</span></footer>
+    <footer class="site-footer">
+      <div class="footer-primary"><span class="footer-brand">Файл в картинке</span><span class="footer-description">Локальное приложение · файлы остаются у вас</span></div>
+      <div class="build-info" aria-label="Версия приложения">
+        <time datetime="__BUILD_DATE_ISO__" title="Дата создания HTML">__BUILD_DATE_TEXT__</time>
+        <span aria-hidden="true">·</span>
+        <code title="__BUILD_COMMIT_TITLE__">__BUILD_COMMIT__</code>
+      </div>
+      <div class="footer-contact-row"><a class="footer-contact" href="https://t.me/azazaaat" target="_blank" rel="noopener noreferrer" aria-label="Telegram: @azazaaat">@azazaaat</a></div>
+    </footer>
   </div>
   <script src="file-parts.js"></script>
   <script src="vault-core.js"></script>
