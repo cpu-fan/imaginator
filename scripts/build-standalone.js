@@ -17,7 +17,7 @@ function inline(tag, file, replacementTag) {
 }
 
 inline('<link rel="stylesheet" href="styles.css">', 'styles.css', 'style');
-for (const file of ['vault-core.js', 'image-codec.js', 'app.js']) {
+for (const file of ['file-parts.js', 'vault-core.js', 'image-codec.js', 'app.js']) {
   inline(`<script src="${file}"></script>`, file, 'script');
 }
 

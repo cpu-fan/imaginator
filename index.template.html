@@ -61,16 +61,23 @@
           </form>
 
           <form id="panel-data" role="tabpanel" aria-labelledby="tab-data" hidden novalidate>
-            <div class="form-heading"><span class="form-number">02</span><div><h3>Создать картинку с данными</h3><p>Приложение подберёт размер PNG под зашифрованный файл.</p></div></div>
-            <div class="field"><label for="data-file">Файл для шифрования <span class="required">*</span></label><input id="data-file" name="file" type="file" required aria-describedby="data-file-hint data-file-info"><p class="field-hint" id="data-file-hint">До 10 МБ. Формат исходного файла сохранится.</p><p class="file-info" id="data-file-info"></p></div>
+            <div class="form-heading"><span class="form-number">02</span><div><h3>Создать картинку с данными</h3><p>Создайте один PNG или разделите файл на несколько картинок.</p></div></div>
+            <div class="field"><label for="data-file">Файл для шифрования <span class="required">*</span></label><input id="data-file" name="file" type="file" required aria-describedby="data-file-hint data-file-info"><p class="field-hint" id="data-file-hint">До 512 МиБ на файл. До 64 МиБ исходных данных в одном PNG.</p><p class="file-info" id="data-file-info"></p></div>
+            <div class="split-settings">
+              <div class="field"><label for="data-split-mode">Способ упаковки</label><select id="data-split-mode" aria-describedby="data-split-hint"><option value="single">Один PNG</option><option value="count">По количеству частей</option><option value="size">По размеру части</option></select></div>
+              <div class="field" id="data-count-field" hidden><label for="data-part-count">Количество частей</label><input id="data-part-count" type="number" min="1" max="1000" step="1" value="4" disabled aria-describedby="data-split-summary"></div>
+              <div class="field" id="data-size-field" hidden><label for="data-part-size">Размер исходных данных в части</label><div class="part-size-inputs"><input id="data-part-size" type="text" inputmode="decimal" value="10" disabled aria-describedby="data-split-hint data-split-summary"><select id="data-part-unit" aria-label="Единица размера части" disabled><option value="KiB">КиБ</option><option value="MiB" selected>МиБ</option></select></div></div>
+            </div>
+            <p class="field-hint" id="data-split-hint">Размер относится к исходным данным: готовые PNG будут больше. 1 КиБ = 1024 байта, 1 МиБ = 1024 × 1024 байт. Максимум 1000 частей.</p>
+            <p class="split-summary" id="data-split-summary" role="status" aria-live="polite">Выберите файл, чтобы увидеть расчёт частей.</p>
             <div class="field password-field"><label for="data-password">Пароль <span class="required">*</span></label><div class="password-wrap"><input id="data-password" name="password" type="password" autocomplete="new-password" required><button class="password-toggle" type="button" aria-controls="data-password" aria-label="Показать пароль">Показать</button></div><p class="field-hint">Сохраните пароль: без него восстановить файл нельзя.</p></div>
             <div class="form-actions"><button class="primary-button" type="submit">Зашифровать и создать PNG <span aria-hidden="true">↗</span></button><p class="form-status" role="status" aria-live="polite"></p></div>
-            <div class="result" hidden><span class="result-icon" aria-hidden="true">✓</span><div><strong>PNG готов</strong><p>Скачайте картинку и храните её без редактирования.</p></div><a class="download-link" href="#" download>Скачать PNG <span aria-hidden="true">↓</span></a></div>
+            <div class="result result-multiple" hidden><div class="result-heading"><span class="result-icon" aria-hidden="true">✓</span><div><strong>PNG готовы</strong><p>Скачайте все части. Для восстановления понадобится полный набор.</p></div></div><ul class="result-list" id="data-results" aria-label="PNG для скачивания"></ul></div>
           </form>
 
           <form id="panel-extract" role="tabpanel" aria-labelledby="tab-extract" hidden novalidate>
-            <div class="form-heading"><span class="form-number">03</span><div><h3>Вернуть исходный файл</h3><p>Загрузите PNG, созданный на этой странице, и введите пароль.</p></div></div>
-            <div class="field"><label for="extract-image">Зашифрованный PNG <span class="required">*</span></label><input id="extract-image" name="image" type="file" accept="image/png,.png" required aria-describedby="extract-image-hint extract-image-info"><p class="field-hint" id="extract-image-hint">Нужен оригинальный PNG: без пересохранения или изменения размера.</p><p class="file-info" id="extract-image-info"></p></div>
+            <div class="form-heading"><span class="form-number">03</span><div><h3>Вернуть исходный файл</h3><p>Выберите все части набора или один прежний PNG и введите пароль.</p></div></div>
+            <div class="field"><label for="extract-image">Зашифрованные PNG <span class="required">*</span></label><input id="extract-image" name="image" type="file" accept="image/png,.png" multiple required aria-describedby="extract-image-hint extract-image-info"><p class="field-hint" id="extract-image-hint">Выберите полный набор в одной операции. Порядок не важен. PNG должны быть оригинальными: без пересохранения или изменения размера.</p><p class="file-info" id="extract-image-info"></p></div>
             <div class="field password-field"><label for="extract-password">Пароль <span class="required">*</span></label><div class="password-wrap"><input id="extract-password" name="password" type="password" autocomplete="current-password" required><button class="password-toggle" type="button" aria-controls="extract-password" aria-label="Показать пароль">Показать</button></div></div>
             <div class="form-actions"><button class="primary-button" type="submit">Извлечь файл <span aria-hidden="true">↗</span></button><p class="form-status" role="status" aria-live="polite"></p></div>
             <div class="result" hidden><span class="result-icon" aria-hidden="true">✓</span><div><strong>Файл восстановлен</strong><p class="result-detail"></p></div><a class="download-link" href="#" download>Скачать файл <span aria-hidden="true">↓</span></a></div>
@@ -80,8 +87,9 @@
 
       <aside class="notes" aria-label="Полезно знать"><div><span class="note-number">01</span><h2>Всё остаётся у вас</h2><p>Шифрование и работа с картинкой выполняются в этом браузере. Файлы никуда не отправляются.</p></div><div><span class="note-number">02</span><h2>Берегите оригинал</h2><p>Для извлечения нужен скачанный PNG без обработки редактором или преобразования в JPEG.</p></div><div><span class="note-number">03</span><h2>Не теряйте пароль</h2><p>Приложение его не хранит. Если пароль забыт, восстановить содержимое невозможно.</p></div></aside>
     </main>
-    <footer class="site-footer"><span>Файл в картинке</span><span>Локальное приложение · до 10 МБ</span></footer>
+    <footer class="site-footer"><span>Файл в картинке</span><span>Локальное приложение · файлы остаются у вас</span></footer>
   </div>
+  <script src="file-parts.js"></script>
   <script src="vault-core.js"></script>
   <script src="image-codec.js"></script>
   <script src="app.js"></script>
