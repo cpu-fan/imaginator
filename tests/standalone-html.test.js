@@ -21,7 +21,7 @@ test('built HTML works without local CSS or JavaScript files', async () => {
   assert.match(html, /<style>[\s\S]+<\/style>/);
 
   const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((match) => match[1]);
-  assert.equal(scripts.length, 4);
+  assert.equal(scripts.length, 5);
 
   const context = vm.createContext({ TextEncoder, TextDecoder, Uint8Array, Uint8ClampedArray, crypto: webcrypto });
   vm.runInContext(scripts[0], context);
@@ -55,4 +55,22 @@ test('embedded modules restore a reordered multipart file without external scrip
   assert.equal(ordered[0].name,'original.bin');
   assert.equal(blob.type,'application/octet-stream');
   assert.deepEqual([...new Uint8Array(await blob.arrayBuffer())],[0,255,42,7,8]);
+});
+
+test('embedded ZIP module preserves a folder through encryption without external scripts', async () => {
+  const html = readFileSync(path.join(projectRoot, 'index.html'), 'utf8');
+  const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(match => match[1]);
+  const context = vm.createContext({TextEncoder,TextDecoder,Uint8Array,Uint8ClampedArray,File,Blob,crypto:webcrypto});
+  for (const script of scripts.slice(0,-1)) vm.runInContext(script,context);
+  const {directoryFile} = require('./helpers/directory-file.js');
+  const {readStoredZip} = require('./helpers/read-stored-zip.js');
+  const archive = await context.DirectoryZip.create([directoryFile('folder/nested/a.txt','123456789')]);
+  const packet = await context.VaultCore.encryptFile({name:archive.name,type:archive.type,bytes:new Uint8Array(await archive.arrayBuffer())},'secret');
+  const image = context.ImageCodec.encodeData(packet);
+  const restored = await context.VaultCore.decryptFile(context.ImageCodec.decode(image.pixels,image.width,image.height).packet,'secret');
+  assert.equal(restored.name,'folder.zip');
+  assert.equal(restored.type,'application/zip');
+  const entries = readStoredZip(restored.bytes);
+  assert.equal(entries[0].name,'folder/nested/a.txt');
+  assert.equal(entries[0].bytes.toString(),'123456789');
 });

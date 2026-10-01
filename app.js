@@ -11,9 +11,9 @@
   let capacityRequest = 0;
 
   function formatSize(bytes) {
-    if (bytes < 1024) return `${bytes} Б`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toLocaleString('ru-RU', { maximumFractionDigits: 1 })} КиБ`;
-    return `${(bytes / (1024 * 1024)).toLocaleString('ru-RU', { maximumFractionDigits: 2 })} МБ`;
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toLocaleString('ru-RU', { maximumFractionDigits: 1 })} kB`;
+    return `${(bytes / (1024 * 1024)).toLocaleString('ru-RU', { maximumFractionDigits: 2 })} MB`;
   }
 
   function setStatus(form, message, isError = false) {
@@ -85,14 +85,15 @@
 
   function updateSplitPreview() {
     syncSplitFields();
-    const node = document.getElementById('data-split-summary'), file = document.getElementById('data-file').files[0];
+    const node = document.getElementById('data-split-summary');
     node.classList.toggle('is-error', false);
-    if (!file) { node.textContent = 'Выберите файл, чтобы увидеть расчёт частей.'; return; }
     try {
+      const file = sourceInfo('data');
+      if (!file) { node.textContent = 'Выберите файл или папку, чтобы увидеть расчёт частей.'; return; }
       const options = readSplitOptions(), parts = FileParts.planParts(file.size, options);
       const min = Math.min(...parts.map(p=>p.length)), max = Math.max(...parts.map(p=>p.length));
       const size = min === max ? formatSize(max) : `${formatSize(min)}–${formatSize(max)}`;
-      node.textContent = `Частей: ${parts.length}. Исходные данные в части: ${size}.` + (options.mode === 'size' ? ` Последняя часть: ${formatSize(parts[parts.length - 1].length)}.` : '') + ' Готовые PNG будут больше.';
+      node.textContent = (folderSelected('data') ? `ZIP: ${formatSize(file.size)}. ` : '') + `Частей: ${parts.length}. Исходные данные в части: ${size}.` + (options.mode === 'size' ? ` Последняя часть: ${formatSize(parts[parts.length - 1].length)}.` : '') + ' Готовые PNG будут больше.';
     } catch (error) { node.classList.toggle('is-error', true); node.textContent = friendlyError(error, 'data'); }
   }
 
@@ -105,7 +106,7 @@
       const bytes = new Uint8Array(await file.slice(part.offset, part.offset + part.length).arrayBuffer());
       const packet = await session.encryptPart({name:file.name,type:file.type,index:part.index,count:parts.length,totalSize:file.size,offset:part.offset,bytes});
       const image = ImageCodec.encodeData(packet), blob = await pngBlob(image.width, image.height, image.pixels);
-      const name = options.mode === 'single' ? pngName(restoredName(file.name), 'данные') : `${stem}.part-${String(part.index + 1).padStart(width,'0')}-of-${String(parts.length).padStart(width,'0')}.png`;
+      const name = options.mode === 'single' ? pngName(restoredName(file.name)) : `${stem}.part-${String(part.index + 1).padStart(width,'0')}-of-${String(parts.length).padStart(width,'0')}.png`;
       entries.push({blob,name,detail:formatSize(blob.size)});
     }
     return entries;
@@ -118,6 +119,7 @@
       button.setAttribute('aria-busy', String(value));
     });
     syncSplitFields();
+    syncSourceFields();
   }
 
   function activateMode(mode, focus = false) {
@@ -141,6 +143,38 @@
     return file;
   }
 
+  function folderSelected(mode) {
+    return document.getElementById(`${mode}-source-kind`).value === 'folder';
+  }
+
+  function syncSourceFields() {
+    for (const mode of ['hide', 'data']) {
+      const folder = folderSelected(mode);
+      for (const kind of ['file', 'folder']) {
+        const active = folder === (kind === 'folder');
+        document.getElementById(`${mode}-${kind}-field`).hidden = !active;
+        const input = document.getElementById(`${mode}-${kind}`);
+        input.disabled = busy || !active;
+        input.required = active;
+      }
+    }
+  }
+
+  function sourceInfo(mode) {
+    if (!folderSelected(mode)) return document.getElementById(`${mode}-file`).files[0];
+    const files = document.getElementById(`${mode}-folder`).files;
+    if (!files.length) return null;
+    return DirectoryZip.plan(files, {maxSize: mode === 'hide' ? MAX_FILE_SIZE : FileParts.MAX_SOURCE_SIZE});
+  }
+
+  async function sourceFile(mode) {
+    if (!folderSelected(mode)) return selectedFile(`${mode}-file`, 'файл');
+    return DirectoryZip.create(document.getElementById(`${mode}-folder`).files, {
+      maxSize: mode === 'hide' ? MAX_FILE_SIZE : FileParts.MAX_SOURCE_SIZE,
+      onProgress: (index, count) => setStatus(forms[mode], `Упаковываем папку в ZIP: файл ${index} из ${count}…`)
+    });
+  }
+
   function passwordFor(mode) {
     const password = document.getElementById(`${mode}-password`).value;
     if (!password.trim()) throw new Error('Введите пароль. Он не может состоять только из пробелов.');
@@ -148,12 +182,12 @@
   }
 
   function checkSourceSize(file) {
-    if (file.size > MAX_FILE_SIZE) throw new Error('Файл слишком большой. Максимальный размер — 10 МБ.');
+    if (file.size > MAX_FILE_SIZE) throw new Error('Файл слишком большой. Максимальный размер — 10 MB.');
   }
 
-  function pngName(fileName, suffix) {
+  function pngName(fileName, suffix = '') {
     const stem = fileName.replace(/\.[^.]+$/, '') || 'file';
-    return `${stem}-${suffix}.png`;
+    return `${stem}${suffix ? `-${suffix}` : ''}.png`;
   }
 
   function restoredName(name) {
@@ -234,7 +268,7 @@
     if (/Malformed file packet|Unsupported file packet|Declared packet length|Image header exceeds capacity/.test(message)) return 'Данные в PNG повреждены или формат не поддерживается. Нужен исходный PNG без изменений.';
     if (/Packet exceeds cover capacity/.test(message)) return 'Изображение слишком маленькое для этого файла. Выберите носитель побольше.';
     if (/Packet exceeds image capacity|Invalid image dimensions/.test(message)) return 'Размер получившегося PNG не поддерживается. Попробуйте файл поменьше.';
-    if (/File exceeds 10 MiB limit/.test(message)) return 'Файл слишком большой. Максимальный размер — 10 МБ.';
+    if (/File exceeds 10 MiB limit/.test(message)) return 'Файл слишком большой. Максимальный размер — 10 MB.';
     if (/Web Crypto is unavailable/.test(message)) return 'В этом браузере недоступен Web Crypto. Откройте страницу в современном браузере.';
     if (/File name or MIME type is too long/.test(message)) return 'Имя файла или его тип слишком длинные. Переименуйте файл и попробуйте снова.';
     if (message) return message;
@@ -244,7 +278,6 @@
   async function updateCoverCapacity() {
     const request = ++capacityRequest;
     const file = document.getElementById('hide-cover').files[0];
-    const source = document.getElementById('hide-file').files[0];
     const box = document.getElementById('capacity-box');
     const text = document.getElementById('capacity-text');
     box.classList.remove('is-error');
@@ -254,6 +287,7 @@
     }
     text.textContent = 'Проверяем размер изображения…';
     try {
+      const source = sourceInfo('hide');
       const image = await imagePixels(file, true);
       if (request !== capacityRequest) return;
       const capacity = ImageCodec.coverCapacity(image.width, image.height);
@@ -321,27 +355,31 @@
       }
 
       if (mode === 'data') {
-        const file = selectedFile('data-file', 'файл'), password = passwordFor(mode);
-        const entries = await createDataPngs(file, password, readSplitOptions());
+        const password = passwordFor(mode), options = readSplitOptions(), info = sourceInfo(mode);
+        if (info) FileParts.planParts(info.size, options);
+        const file = await sourceFile(mode);
+        const entries = await createDataPngs(file, password, options);
         showResults(form, entries);
         form.querySelectorAll('.download-link').forEach(link => link.click());
         setStatus(form, `Готово PNG: ${entries.length}. Скачивание начато. Если браузер его заблокировал, используйте ссылки ниже.`);
         return;
       }
 
-      const file = selectedFile(`${mode}-file`, 'файл');
-      checkSourceSize(file);
       const password = passwordFor(mode);
+      const coverFile = selectedFile('hide-cover', 'изображение-носитель');
+      const info = sourceInfo(mode);
+      if (info) checkSourceSize(info);
       let cover;
       if (mode === 'hide') {
-        const coverFile = selectedFile('hide-cover', 'изображение-носитель');
         setStatus(form, 'Открываем изображение и проверяем вместимость…');
         cover = await imagePixels(coverFile, true);
-        const required = VaultCore.estimatePacketLength(file.size, file.name, file.type);
+        if (!info) throw new Error(folderSelected(mode) ? 'Выберите папку с файлами.' : 'Выберите файл.');
+        const required = VaultCore.estimatePacketLength(info.size, info.name, info.type);
         if (required > ImageCodec.coverCapacity(cover.width, cover.height)) {
           throw new Error('Изображение слишком маленькое для этого файла. Выберите носитель побольше.');
         }
       }
+      const file = await sourceFile(mode);
       setStatus(form, 'Шифруем файл. Это может занять несколько секунд…');
       const bytes = new Uint8Array(await file.arrayBuffer());
       const packet = await VaultCore.encryptFile({ name: file.name, type: file.type, bytes }, password);
@@ -350,7 +388,7 @@
         : ImageCodec.encodeData(packet);
       setStatus(form, 'Сохраняем PNG…');
       const blob = await pngBlob(output.width, output.height, output.pixels);
-      showResult(form, blob, pngName(file.name, mode === 'hide' ? 'скрыто' : 'данные'));
+      showResult(form, blob, pngName(file.name, mode === 'hide' ? 'скрыто' : ''));
       setStatus(form, 'PNG готов. Скачайте картинку ниже.');
     } catch (error) {
       clearResult(form);
@@ -364,7 +402,7 @@
       return Boolean(globalThis.crypto && crypto.subtle && crypto.getRandomValues && globalThis.File &&
         File.prototype.arrayBuffer && globalThis.Blob && globalThis.Image && globalThis.ImageData &&
         globalThis.URL && URL.createObjectURL && URL.revokeObjectURL && canvas.getContext &&
-        canvas.getContext('2d') && canvas.toBlob && globalThis.VaultCore && globalThis.ImageCodec && globalThis.FileParts);
+        canvas.getContext('2d') && canvas.toBlob && globalThis.VaultCore && globalThis.ImageCodec && globalThis.FileParts && globalThis.DirectoryZip);
     } catch {
       return false;
     }
@@ -402,11 +440,17 @@
       setStatus(form, '');
       const info = document.getElementById(`${input.id}-info`);
       const file = input.files[0];
-      info.textContent = input.id === 'extract-image' && input.files.length > 0
+      if (input.id === 'data-folder' || input.id === 'hide-folder') {
+        const mode = input.id.split('-')[0];
+        try {
+          const archive = sourceInfo(mode);
+          info.textContent = archive ? `${archive.name} · файлов: ${input.files.length} · ZIP: ${formatSize(archive.size)}` : '';
+        } catch (error) { info.textContent = ''; setStatus(form, friendlyError(error, mode), true); }
+      } else info.textContent = input.id === 'extract-image' && input.files.length > 0
         ? `Выбрано PNG: ${input.files.length} · ${formatSize(Array.from(input.files).reduce((sum,item)=>sum+item.size,0))}`
         : file ? `${file.name} · ${formatSize(file.size)}` : '';
-      if (input.id === 'data-file') updateSplitPreview();
-      if (input.id === 'hide-file' || input.id === 'hide-cover') updateCoverCapacity();
+      if (input.id === 'data-file' || input.id === 'data-folder') updateSplitPreview();
+      if (input.id === 'hide-file' || input.id === 'hide-folder' || input.id === 'hide-cover') updateCoverCapacity();
     });
   });
   document.querySelectorAll('input[type=password]').forEach((input) => {
@@ -420,6 +464,26 @@
     const event = input.tagName === 'SELECT' ? 'change' : 'input';
     input.addEventListener(event, () => { clearResult(forms.data); setStatus(forms.data, ''); updateSplitPreview(); });
   });
+  for (const mode of ['hide', 'data']) {
+    const folderInput = document.getElementById(`${mode}-folder`);
+    const folderOption = document.getElementById(`${mode}-folder-option`);
+    if (!('webkitdirectory' in folderInput)) {
+      folderOption.disabled = true;
+      folderOption.textContent = 'Папка — не поддерживается браузером';
+    }
+    document.getElementById(`${mode}-source-kind`).addEventListener('change', () => {
+      clearResult(forms[mode]);
+      setStatus(forms[mode], '');
+      for (const kind of ['file', 'folder']) {
+        document.getElementById(`${mode}-${kind}`).value = '';
+        document.getElementById(`${mode}-${kind}-info`).textContent = '';
+      }
+      syncSourceFields();
+      if (mode === 'data') updateSplitPreview();
+      else updateCoverCapacity();
+    });
+  }
+  syncSourceFields();
   updateSplitPreview();
   modes.forEach((mode) => forms[mode].addEventListener('submit', async (event) => {
     event.preventDefault();

@@ -11,7 +11,9 @@
 
 .split-settings{display:grid;grid-template-columns:1fr 1fr;gap:22px}.split-settings [hidden]{display:none!important}.split-settings select,.split-settings input{width:100%;min-width:0;height:48px;padding:10px 13px;border:1px solid #cddbd0;border-radius:9px;color:#1d3225;background:#fff;font:inherit;font-size:14px}.part-size-inputs{display:grid;grid-template-columns:1fr 90px;gap:10px}.split-summary{margin:14px 0 24px;padding:13px 16px;border:1px solid #dcebdd;border-radius:9px;background:#f5faf4;color:#426c4e;font-size:13px;line-height:1.6}.split-summary.is-error{color:#a14835;background:#fff4f0;border-color:#f1d5ca}.result-multiple{display:block}.result-multiple[hidden]{display:none}.result-heading{display:flex;gap:15px;align-items:center}.result-list{list-style:none;padding:0;margin:16px 0 0;display:grid;gap:10px;max-height:420px;overflow:auto}.result-list li{display:flex;align-items:center;gap:12px;border-top:1px solid #d4e6d7;padding-top:12px}.result-file{min-width:0;flex:1}.result-file strong{display:block;overflow-wrap:anywhere;font-size:13px}.result-list .download-link{flex:none}.split-settings :disabled{opacity:.6}select:focus-visible{outline:3px solid #87cda1;outline-offset:3px}@media(max-width:580px){.split-settings{grid-template-columns:1fr;gap:0}.result-list li{align-items:flex-start;flex-direction:column}.result-list .download-link{margin:0}}
 
-.split-settings select{appearance:none;padding-right:42px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='m1 1 5 5 5-5' fill='none' stroke='%23426c4e' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;background-size:12px 8px}
+
+.source-kind{max-width:320px}.source-kind select{width:100%;height:48px;padding:10px 13px;border:1px solid #cddbd0;border-radius:9px;color:#1d3225;background:#fff;font:inherit;font-size:14px}.field[hidden]{display:none!important}
+.split-settings select,.source-kind select{appearance:none;padding-right:42px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='m1 1 5 5 5-5' fill='none' stroke='%23426c4e' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;background-size:12px 8px}
 
 </style>
 </head>
@@ -30,7 +32,7 @@
         <div class="intro-copy">
           <p class="eyebrow">Локальный сейф для файлов</p>
           <h1 id="page-title">Спрячьте важное<br><em>в обычном PNG.</em></h1>
-          <p class="intro-lead">Выберите файл, задайте пароль и скачайте картинку. Чтобы вернуть файл, откройте эту страницу снова — интернет не нужен.</p>
+          <p class="intro-lead">Выберите файл или папку, задайте пароль и скачайте картинку. Чтобы вернуть данные, откройте эту страницу снова — интернет не нужен.</p>
           <div class="trust-line"><span class="trust-icon" aria-hidden="true">↗</span><span>Файлы и пароль остаются на вашем устройстве</span></div>
         </div>
         <div class="hero-art" aria-hidden="true">
@@ -57,8 +59,10 @@
         <div class="form-card">
           <form id="panel-hide" role="tabpanel" aria-labelledby="tab-hide" hidden novalidate>
             <div class="form-heading"><span class="form-number">01</span><div><h3>Скрыть файл в изображении</h3><p>Внешний вид картинки почти не изменится. Нужен достаточно большой носитель.</p></div></div>
+            <div class="field source-kind"><label for="hide-source-kind">Что зашифровать</label><select id="hide-source-kind"><option value="file">Файл</option><option value="folder" id="hide-folder-option">Папка → ZIP</option></select></div>
             <div class="field-grid">
-              <div class="field"><label for="hide-file">Файл для шифрования <span class="required">*</span></label><input id="hide-file" name="file" type="file" required aria-describedby="hide-file-hint hide-file-info"><p class="field-hint" id="hide-file-hint">До 10 МБ. Подойдёт и пустой файл.</p><p class="file-info" id="hide-file-info"></p></div>
+              <div class="field" id="hide-file-field"><label for="hide-file">Файл для шифрования <span class="required">*</span></label><input id="hide-file" name="file" type="file" required aria-describedby="hide-file-hint hide-file-info"><p class="field-hint" id="hide-file-hint">До 10 MB. Подойдёт и пустой файл.</p><p class="file-info" id="hide-file-info"></p></div>
+              <div class="field" id="hide-folder-field" hidden><label for="hide-folder">Папка для шифрования <span class="required">*</span></label><input id="hide-folder" name="folder" type="file" webkitdirectory multiple disabled aria-describedby="hide-folder-hint hide-folder-info"><p class="field-hint" id="hide-folder-hint">Папка будет упакована в ZIP без сжатия. До 10 MB вместе со служебными данными ZIP. Пустые папки не сохраняются. После извлечения скачивается ZIP.</p><p class="file-info" id="hide-folder-info"></p></div>
               <div class="field"><label for="hide-cover">Изображение-носитель <span class="required">*</span></label><input id="hide-cover" name="cover" type="file" accept="image/*" required aria-describedby="hide-cover-hint hide-cover-info"><p class="field-hint" id="hide-cover-hint">PNG, JPEG или другое изображение, которое открывает браузер.</p><p class="file-info" id="hide-cover-info"></p></div>
             </div>
             <div class="capacity-box" id="capacity-box"><span class="capacity-symbol" aria-hidden="true">▧</span><span id="capacity-text">Выберите изображение, чтобы узнать его вместимость.</span></div>
@@ -69,13 +73,15 @@
 
           <form id="panel-data" role="tabpanel" aria-labelledby="tab-data" novalidate>
             <div class="form-heading"><span class="form-number">02</span><div><h3>Создать картинку с данными</h3><p>Создайте один PNG или разделите файл на несколько картинок.</p></div></div>
-            <div class="field"><label for="data-file">Файл для шифрования <span class="required">*</span></label><input id="data-file" name="file" type="file" required aria-describedby="data-file-hint data-file-info"><p class="field-hint" id="data-file-hint">До 512 МБ на файл. До 64 МБ исходных данных в одном PNG.</p><p class="file-info" id="data-file-info"></p></div>
+            <div class="field source-kind"><label for="data-source-kind">Что зашифровать</label><select id="data-source-kind"><option value="file">Файл</option><option value="folder" id="data-folder-option">Папка → ZIP</option></select></div>
+            <div class="field" id="data-file-field"><label for="data-file">Файл для шифрования <span class="required">*</span></label><input id="data-file" name="file" type="file" required aria-describedby="data-file-hint data-file-info"><p class="field-hint" id="data-file-hint">До 512 MB на файл. До 64 MB исходных данных в одном PNG.</p><p class="file-info" id="data-file-info"></p></div>
+            <div class="field" id="data-folder-field" hidden><label for="data-folder">Папка для шифрования <span class="required">*</span></label><input id="data-folder" name="folder" type="file" webkitdirectory multiple disabled aria-describedby="data-folder-hint data-folder-info"><p class="field-hint" id="data-folder-hint">Папка будет упакована в ZIP без сжатия. До 512 MB вместе со служебными данными ZIP; до 64 MB в одном PNG. Пустые папки не сохраняются. После извлечения скачивается ZIP.</p><p class="file-info" id="data-folder-info"></p></div>
             <div class="split-settings">
               <div class="field"><label for="data-split-mode">Способ упаковки</label><select id="data-split-mode" aria-describedby="data-split-hint"><option value="single">Один PNG</option><option value="count">По количеству частей</option><option value="size">По размеру части</option></select></div>
               <div class="field" id="data-count-field" hidden><label for="data-part-count">Количество частей</label><input id="data-part-count" type="number" min="1" max="1000" step="1" value="4" disabled aria-describedby="data-split-summary"></div>
-              <div class="field" id="data-size-field" hidden><label for="data-part-size">Размер исходных данных в части</label><div class="part-size-inputs"><input id="data-part-size" type="text" inputmode="decimal" value="10" disabled aria-describedby="data-split-hint data-split-summary"><select id="data-part-unit" aria-label="Единица размера части" disabled><option value="KiB">КиБ</option><option value="MiB" selected>МБ</option></select></div></div>
+              <div class="field" id="data-size-field" hidden><label for="data-part-size">Размер исходных данных в части</label><div class="part-size-inputs"><input id="data-part-size" type="text" inputmode="decimal" value="10" disabled aria-describedby="data-split-hint data-split-summary"><select id="data-part-unit" aria-label="Единица размера части" disabled><option value="KiB">kB</option><option value="MiB" selected>MB</option></select></div></div>
             </div>
-            <p class="field-hint" id="data-split-hint">Размер относится к исходным данным: готовые PNG будут больше. 1 КиБ = 1024 байта, 1 МБ = 1024 × 1024 байт. Максимум 1000 частей.</p>
+            <p class="field-hint" id="data-split-hint">Размер относится к исходным данным: готовые PNG будут больше. 1 kB = 1024 байта, 1 MB = 1024 × 1024 байт. Максимум 1000 частей.</p>
             <p class="split-summary" id="data-split-summary" role="status" aria-live="polite">Выберите файл, чтобы увидеть расчёт частей.</p>
             <div class="field password-field"><label for="data-password">Пароль <span class="required">*</span></label><div class="password-wrap"><input id="data-password" name="password" type="password" autocomplete="new-password" required><button class="password-toggle" type="button" aria-controls="data-password" aria-label="Показать пароль">Показать</button></div><p class="field-hint">Сохраните пароль: без него восстановить файл нельзя.</p></div>
             <div class="form-actions"><button class="primary-button" type="submit">Зашифровать и создать PNG <span aria-hidden="true">↗</span></button><p class="form-status" role="status" aria-live="polite"></p></div>
@@ -113,25 +119,25 @@
   }
   function parsePartSize(value, unit) {
     if (typeof value !== 'string' || !/^(?:[0-9]+(?:[.,][0-9]+)?|[.,][0-9]+)$/.test(value.trim()) || !['KiB','MiB'].includes(unit)) {
-      fail('INVALID_SPLIT', 'Введите положительный размер части в КиБ или МБ.');
+      fail('INVALID_SPLIT', 'Введите положительный размер части в kB или MB.');
     }
     const size = Math.floor(Number(value.trim().replace(',', '.')) * (unit === 'KiB' ? 1024 : 1048576));
-    if (!integer(size, 1, MAX_PART_SIZE)) fail('INVALID_SPLIT', 'Размер части должен быть от 1 байта до 64 МБ.');
+    if (!integer(size, 1, MAX_PART_SIZE)) fail('INVALID_SPLIT', 'Размер части должен быть от 1 байта до 64 MB.');
     return size;
   }
   function planParts(totalSize, options) {
-    if (!integer(totalSize, 0, MAX_SOURCE_SIZE)) fail('INVALID_SPLIT', 'Размер исходного файла не должен превышать 512 МБ.');
+    if (!integer(totalSize, 0, MAX_SOURCE_SIZE)) fail('INVALID_SPLIT', 'Размер исходного файла не должен превышать 512 MB.');
     if (!options || !['single','count','size'].includes(options.mode)) fail('INVALID_SPLIT', 'Выберите способ разбивки.');
     let count;
     if (options.mode === 'size') {
-      if (!integer(options.partSize, 1, MAX_PART_SIZE)) fail('INVALID_SPLIT', 'Размер части должен быть от 1 байта до 64 МБ.');
+      if (!integer(options.partSize, 1, MAX_PART_SIZE)) fail('INVALID_SPLIT', 'Размер части должен быть от 1 байта до 64 MB.');
       count = Math.max(1, Math.ceil(totalSize / options.partSize));
     } else count = options.mode === 'single' ? 1 : options.count;
     if (!integer(count, 1, MAX_PART_COUNT)) fail('INVALID_SPLIT', 'Нужно от 1 до 1000 частей. Увеличьте размер части или уменьшите количество.');
     if ((totalSize === 0 && count !== 1) || (totalSize > 0 && count > totalSize)) fail('INVALID_SPLIT', 'Количество частей не может превышать число байтов файла. Для пустого файла нужна одна часть.');
     const q = Math.floor(totalSize / count), r = totalSize % count;
     const largest = options.mode === 'size' ? Math.min(totalSize, options.partSize) : q + (r ? 1 : 0);
-    if (largest > MAX_PART_SIZE) fail('INVALID_SPLIT', 'В одной части не должно быть больше 64 МБ. Выберите разбивку или увеличьте количество частей.');
+    if (largest > MAX_PART_SIZE) fail('INVALID_SPLIT', 'В одной части не должно быть больше 64 MB. Выберите разбивку или увеличьте количество частей.');
     return Array.from({length:count}, (_, index) => options.mode === 'size'
       ? {index,offset:index * options.partSize,length:Math.min(options.partSize, totalSize - index * options.partSize)}
       : {index,offset:index * q + Math.min(index,r),length:q + (index < r ? 1 : 0)});
@@ -511,6 +517,111 @@
 
 </script>
   <script>
+(function (root) {
+  'use strict';
+
+  const MAX_SIZE = 512 * 1024 * 1024;
+  const CHUNK_SIZE = 1024 * 1024;
+  const encoder = new TextEncoder();
+  const crcTable = new Uint32Array(256);
+  for (let i = 0; i < 256; i++) {
+    let crc = i;
+    for (let bit = 0; bit < 8; bit++) crc = (crc >>> 1) ^ ((crc & 1) ? 0xedb88320 : 0);
+    crcTable[i] = crc;
+  }
+
+  // Stored ZIP: its exact size is known before any file is read.
+  function plan(files, {maxSize = MAX_SIZE} = {}) {
+    files = Array.from(files);
+    if (!files.length) throw new Error('Выберите папку с файлами. Пустые папки браузер не передаёт.');
+    if (files.length > 65535) throw new Error('В папке должно быть не больше 65535 файлов.');
+    const paths = new Set(), entries = [];
+    let folder, size = 22;
+    for (const file of files) {
+      const path = file.webkitRelativePath;
+      if (typeof path !== 'string' || /[\\\x00-\x1f:]/.test(path)) throw new Error('Некорректный путь файла в папке.');
+      const segments = path.split('/');
+      if (segments.length < 2 || segments.some(segment => !segment || segment === '.' || segment === '..')) throw new Error('Некорректный путь файла в папке.');
+      if (folder && folder !== segments[0]) throw new Error('Выберите файлы одной папки.');
+      folder = segments[0];
+      if (paths.has(path)) throw new Error('В папке повторяется путь файла.');
+      paths.add(path);
+      const name = encoder.encode(path);
+      if (name.length > 65535) throw new Error('Путь файла в папке слишком длинный для ZIP.');
+      if (!Number.isSafeInteger(file.size) || file.size < 0) throw new Error('Некорректный размер файла в папке.');
+      size += 76 + 2 * name.length + file.size;
+      if (size > Math.min(maxSize, MAX_SIZE)) throw new Error('Размер ZIP превышает допустимый размер. Максимум — 512 MB, при скрытии в картинке — 10 MB.');
+      entries.push({file, name});
+    }
+    return {name: `${folder}.zip`, type: 'application/zip', size, entries};
+  }
+
+  async function checksum(file) {
+    let crc = 0xffffffff;
+    for (let offset = 0; offset < file.size; offset += CHUNK_SIZE) {
+      const bytes = new Uint8Array(await file.slice(offset, Math.min(file.size, offset + CHUNK_SIZE)).arrayBuffer());
+      for (const byte of bytes) crc = (crc >>> 8) ^ crcTable[(crc ^ byte) & 255];
+    }
+    return (crc ^ 0xffffffff) >>> 0;
+  }
+
+  function timestamp(lastModified) {
+    const date = new Date(lastModified);
+    const year = date.getFullYear();
+    if (!Number.isFinite(year) || year < 1980) return {time: 0, date: 33};
+    if (year > 2107) return {time: 0xbf7d, date: 0xff9f};
+    return {
+      time: (date.getHours() << 11) | (date.getMinutes() << 5) | (date.getSeconds() >>> 1),
+      date: ((year - 1980) << 9) | ((date.getMonth() + 1) << 5) | date.getDate()
+    };
+  }
+
+  async function create(files, options = {}) {
+    const archive = plan(files, options), localRecords = [], centralRecords = [];
+    let offset = 0, centralSize = 0;
+    for (let index = 0; index < archive.entries.length; index++) {
+      const {file, name} = archive.entries[index];
+      if (options.onProgress) options.onProgress(index + 1, archive.entries.length);
+      const crc = await checksum(file), stamp = timestamp(file.lastModified);
+      const local = new Uint8Array(30 + name.length), header = new DataView(local.buffer);
+      header.setUint32(0, 0x04034b50, true);
+      header.setUint16(4, 20, true);
+      header.setUint16(6, 0x0800, true); // UTF-8 filenames
+      header.setUint16(10, stamp.time, true);
+      header.setUint16(12, stamp.date, true);
+      header.setUint32(14, crc, true);
+      header.setUint32(18, file.size, true);
+      header.setUint32(22, file.size, true);
+      header.setUint16(26, name.length, true);
+      local.set(name, 30);
+      const central = new Uint8Array(46 + name.length), directory = new DataView(central.buffer);
+      directory.setUint32(0, 0x02014b50, true);
+      directory.setUint16(4, 20, true);
+      // Version, flags, method, timestamp, CRC, sizes and name length.
+      central.set(local.subarray(4, 28), 6);
+      directory.setUint32(42, offset, true);
+      central.set(name, 46);
+      localRecords.push(local, file);
+      centralRecords.push(central);
+      offset += local.length + file.size;
+      centralSize += central.length;
+    }
+    const end = new Uint8Array(22), header = new DataView(end.buffer);
+    header.setUint32(0, 0x06054b50, true);
+    header.setUint16(8, archive.entries.length, true);
+    header.setUint16(10, archive.entries.length, true);
+    header.setUint32(12, centralSize, true);
+    header.setUint32(16, offset, true);
+    return new File([...localRecords, ...centralRecords, end], archive.name, {type: archive.type});
+  }
+
+  const DirectoryZip = {plan, create};
+  if (typeof module === 'object' && module.exports) module.exports = DirectoryZip;
+  else root.DirectoryZip = DirectoryZip;
+})(typeof globalThis === 'object' ? globalThis : this);
+
+</script>
+  <script>
 (function () {
   'use strict';
 
@@ -524,9 +635,9 @@
   let capacityRequest = 0;
 
   function formatSize(bytes) {
-    if (bytes < 1024) return `${bytes} Б`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toLocaleString('ru-RU', { maximumFractionDigits: 1 })} КиБ`;
-    return `${(bytes / (1024 * 1024)).toLocaleString('ru-RU', { maximumFractionDigits: 2 })} МБ`;
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toLocaleString('ru-RU', { maximumFractionDigits: 1 })} kB`;
+    return `${(bytes / (1024 * 1024)).toLocaleString('ru-RU', { maximumFractionDigits: 2 })} MB`;
   }
 
   function setStatus(form, message, isError = false) {
@@ -598,14 +709,15 @@
 
   function updateSplitPreview() {
     syncSplitFields();
-    const node = document.getElementById('data-split-summary'), file = document.getElementById('data-file').files[0];
+    const node = document.getElementById('data-split-summary');
     node.classList.toggle('is-error', false);
-    if (!file) { node.textContent = 'Выберите файл, чтобы увидеть расчёт частей.'; return; }
     try {
+      const file = sourceInfo('data');
+      if (!file) { node.textContent = 'Выберите файл или папку, чтобы увидеть расчёт частей.'; return; }
       const options = readSplitOptions(), parts = FileParts.planParts(file.size, options);
       const min = Math.min(...parts.map(p=>p.length)), max = Math.max(...parts.map(p=>p.length));
       const size = min === max ? formatSize(max) : `${formatSize(min)}–${formatSize(max)}`;
-      node.textContent = `Частей: ${parts.length}. Исходные данные в части: ${size}.` + (options.mode === 'size' ? ` Последняя часть: ${formatSize(parts[parts.length - 1].length)}.` : '') + ' Готовые PNG будут больше.';
+      node.textContent = (folderSelected('data') ? `ZIP: ${formatSize(file.size)}. ` : '') + `Частей: ${parts.length}. Исходные данные в части: ${size}.` + (options.mode === 'size' ? ` Последняя часть: ${formatSize(parts[parts.length - 1].length)}.` : '') + ' Готовые PNG будут больше.';
     } catch (error) { node.classList.toggle('is-error', true); node.textContent = friendlyError(error, 'data'); }
   }
 
@@ -618,7 +730,7 @@
       const bytes = new Uint8Array(await file.slice(part.offset, part.offset + part.length).arrayBuffer());
       const packet = await session.encryptPart({name:file.name,type:file.type,index:part.index,count:parts.length,totalSize:file.size,offset:part.offset,bytes});
       const image = ImageCodec.encodeData(packet), blob = await pngBlob(image.width, image.height, image.pixels);
-      const name = options.mode === 'single' ? pngName(restoredName(file.name), 'данные') : `${stem}.part-${String(part.index + 1).padStart(width,'0')}-of-${String(parts.length).padStart(width,'0')}.png`;
+      const name = options.mode === 'single' ? pngName(restoredName(file.name)) : `${stem}.part-${String(part.index + 1).padStart(width,'0')}-of-${String(parts.length).padStart(width,'0')}.png`;
       entries.push({blob,name,detail:formatSize(blob.size)});
     }
     return entries;
@@ -631,6 +743,7 @@
       button.setAttribute('aria-busy', String(value));
     });
     syncSplitFields();
+    syncSourceFields();
   }
 
   function activateMode(mode, focus = false) {
@@ -654,6 +767,38 @@
     return file;
   }
 
+  function folderSelected(mode) {
+    return document.getElementById(`${mode}-source-kind`).value === 'folder';
+  }
+
+  function syncSourceFields() {
+    for (const mode of ['hide', 'data']) {
+      const folder = folderSelected(mode);
+      for (const kind of ['file', 'folder']) {
+        const active = folder === (kind === 'folder');
+        document.getElementById(`${mode}-${kind}-field`).hidden = !active;
+        const input = document.getElementById(`${mode}-${kind}`);
+        input.disabled = busy || !active;
+        input.required = active;
+      }
+    }
+  }
+
+  function sourceInfo(mode) {
+    if (!folderSelected(mode)) return document.getElementById(`${mode}-file`).files[0];
+    const files = document.getElementById(`${mode}-folder`).files;
+    if (!files.length) return null;
+    return DirectoryZip.plan(files, {maxSize: mode === 'hide' ? MAX_FILE_SIZE : FileParts.MAX_SOURCE_SIZE});
+  }
+
+  async function sourceFile(mode) {
+    if (!folderSelected(mode)) return selectedFile(`${mode}-file`, 'файл');
+    return DirectoryZip.create(document.getElementById(`${mode}-folder`).files, {
+      maxSize: mode === 'hide' ? MAX_FILE_SIZE : FileParts.MAX_SOURCE_SIZE,
+      onProgress: (index, count) => setStatus(forms[mode], `Упаковываем папку в ZIP: файл ${index} из ${count}…`)
+    });
+  }
+
   function passwordFor(mode) {
     const password = document.getElementById(`${mode}-password`).value;
     if (!password.trim()) throw new Error('Введите пароль. Он не может состоять только из пробелов.');
@@ -661,12 +806,12 @@
   }
 
   function checkSourceSize(file) {
-    if (file.size > MAX_FILE_SIZE) throw new Error('Файл слишком большой. Максимальный размер — 10 МБ.');
+    if (file.size > MAX_FILE_SIZE) throw new Error('Файл слишком большой. Максимальный размер — 10 MB.');
   }
 
-  function pngName(fileName, suffix) {
+  function pngName(fileName, suffix = '') {
     const stem = fileName.replace(/\.[^.]+$/, '') || 'file';
-    return `${stem}-${suffix}.png`;
+    return `${stem}${suffix ? `-${suffix}` : ''}.png`;
   }
 
   function restoredName(name) {
@@ -747,7 +892,7 @@
     if (/Malformed file packet|Unsupported file packet|Declared packet length|Image header exceeds capacity/.test(message)) return 'Данные в PNG повреждены или формат не поддерживается. Нужен исходный PNG без изменений.';
     if (/Packet exceeds cover capacity/.test(message)) return 'Изображение слишком маленькое для этого файла. Выберите носитель побольше.';
     if (/Packet exceeds image capacity|Invalid image dimensions/.test(message)) return 'Размер получившегося PNG не поддерживается. Попробуйте файл поменьше.';
-    if (/File exceeds 10 MiB limit/.test(message)) return 'Файл слишком большой. Максимальный размер — 10 МБ.';
+    if (/File exceeds 10 MiB limit/.test(message)) return 'Файл слишком большой. Максимальный размер — 10 MB.';
     if (/Web Crypto is unavailable/.test(message)) return 'В этом браузере недоступен Web Crypto. Откройте страницу в современном браузере.';
     if (/File name or MIME type is too long/.test(message)) return 'Имя файла или его тип слишком длинные. Переименуйте файл и попробуйте снова.';
     if (message) return message;
@@ -757,7 +902,6 @@
   async function updateCoverCapacity() {
     const request = ++capacityRequest;
     const file = document.getElementById('hide-cover').files[0];
-    const source = document.getElementById('hide-file').files[0];
     const box = document.getElementById('capacity-box');
     const text = document.getElementById('capacity-text');
     box.classList.remove('is-error');
@@ -767,6 +911,7 @@
     }
     text.textContent = 'Проверяем размер изображения…';
     try {
+      const source = sourceInfo('hide');
       const image = await imagePixels(file, true);
       if (request !== capacityRequest) return;
       const capacity = ImageCodec.coverCapacity(image.width, image.height);
@@ -834,27 +979,31 @@
       }
 
       if (mode === 'data') {
-        const file = selectedFile('data-file', 'файл'), password = passwordFor(mode);
-        const entries = await createDataPngs(file, password, readSplitOptions());
+        const password = passwordFor(mode), options = readSplitOptions(), info = sourceInfo(mode);
+        if (info) FileParts.planParts(info.size, options);
+        const file = await sourceFile(mode);
+        const entries = await createDataPngs(file, password, options);
         showResults(form, entries);
         form.querySelectorAll('.download-link').forEach(link => link.click());
         setStatus(form, `Готово PNG: ${entries.length}. Скачивание начато. Если браузер его заблокировал, используйте ссылки ниже.`);
         return;
       }
 
-      const file = selectedFile(`${mode}-file`, 'файл');
-      checkSourceSize(file);
       const password = passwordFor(mode);
+      const coverFile = selectedFile('hide-cover', 'изображение-носитель');
+      const info = sourceInfo(mode);
+      if (info) checkSourceSize(info);
       let cover;
       if (mode === 'hide') {
-        const coverFile = selectedFile('hide-cover', 'изображение-носитель');
         setStatus(form, 'Открываем изображение и проверяем вместимость…');
         cover = await imagePixels(coverFile, true);
-        const required = VaultCore.estimatePacketLength(file.size, file.name, file.type);
+        if (!info) throw new Error(folderSelected(mode) ? 'Выберите папку с файлами.' : 'Выберите файл.');
+        const required = VaultCore.estimatePacketLength(info.size, info.name, info.type);
         if (required > ImageCodec.coverCapacity(cover.width, cover.height)) {
           throw new Error('Изображение слишком маленькое для этого файла. Выберите носитель побольше.');
         }
       }
+      const file = await sourceFile(mode);
       setStatus(form, 'Шифруем файл. Это может занять несколько секунд…');
       const bytes = new Uint8Array(await file.arrayBuffer());
       const packet = await VaultCore.encryptFile({ name: file.name, type: file.type, bytes }, password);
@@ -863,7 +1012,7 @@
         : ImageCodec.encodeData(packet);
       setStatus(form, 'Сохраняем PNG…');
       const blob = await pngBlob(output.width, output.height, output.pixels);
-      showResult(form, blob, pngName(file.name, mode === 'hide' ? 'скрыто' : 'данные'));
+      showResult(form, blob, pngName(file.name, mode === 'hide' ? 'скрыто' : ''));
       setStatus(form, 'PNG готов. Скачайте картинку ниже.');
     } catch (error) {
       clearResult(form);
@@ -877,7 +1026,7 @@
       return Boolean(globalThis.crypto && crypto.subtle && crypto.getRandomValues && globalThis.File &&
         File.prototype.arrayBuffer && globalThis.Blob && globalThis.Image && globalThis.ImageData &&
         globalThis.URL && URL.createObjectURL && URL.revokeObjectURL && canvas.getContext &&
-        canvas.getContext('2d') && canvas.toBlob && globalThis.VaultCore && globalThis.ImageCodec && globalThis.FileParts);
+        canvas.getContext('2d') && canvas.toBlob && globalThis.VaultCore && globalThis.ImageCodec && globalThis.FileParts && globalThis.DirectoryZip);
     } catch {
       return false;
     }
@@ -915,11 +1064,17 @@
       setStatus(form, '');
       const info = document.getElementById(`${input.id}-info`);
       const file = input.files[0];
-      info.textContent = input.id === 'extract-image' && input.files.length > 0
+      if (input.id === 'data-folder' || input.id === 'hide-folder') {
+        const mode = input.id.split('-')[0];
+        try {
+          const archive = sourceInfo(mode);
+          info.textContent = archive ? `${archive.name} · файлов: ${input.files.length} · ZIP: ${formatSize(archive.size)}` : '';
+        } catch (error) { info.textContent = ''; setStatus(form, friendlyError(error, mode), true); }
+      } else info.textContent = input.id === 'extract-image' && input.files.length > 0
         ? `Выбрано PNG: ${input.files.length} · ${formatSize(Array.from(input.files).reduce((sum,item)=>sum+item.size,0))}`
         : file ? `${file.name} · ${formatSize(file.size)}` : '';
-      if (input.id === 'data-file') updateSplitPreview();
-      if (input.id === 'hide-file' || input.id === 'hide-cover') updateCoverCapacity();
+      if (input.id === 'data-file' || input.id === 'data-folder') updateSplitPreview();
+      if (input.id === 'hide-file' || input.id === 'hide-folder' || input.id === 'hide-cover') updateCoverCapacity();
     });
   });
   document.querySelectorAll('input[type=password]').forEach((input) => {
@@ -933,6 +1088,26 @@
     const event = input.tagName === 'SELECT' ? 'change' : 'input';
     input.addEventListener(event, () => { clearResult(forms.data); setStatus(forms.data, ''); updateSplitPreview(); });
   });
+  for (const mode of ['hide', 'data']) {
+    const folderInput = document.getElementById(`${mode}-folder`);
+    const folderOption = document.getElementById(`${mode}-folder-option`);
+    if (!('webkitdirectory' in folderInput)) {
+      folderOption.disabled = true;
+      folderOption.textContent = 'Папка — не поддерживается браузером';
+    }
+    document.getElementById(`${mode}-source-kind`).addEventListener('change', () => {
+      clearResult(forms[mode]);
+      setStatus(forms[mode], '');
+      for (const kind of ['file', 'folder']) {
+        document.getElementById(`${mode}-${kind}`).value = '';
+        document.getElementById(`${mode}-${kind}-info`).textContent = '';
+      }
+      syncSourceFields();
+      if (mode === 'data') updateSplitPreview();
+      else updateCoverCapacity();
+    });
+  }
+  syncSourceFields();
   updateSplitPreview();
   modes.forEach((mode) => forms[mode].addEventListener('submit', async (event) => {
     event.preventDefault();
